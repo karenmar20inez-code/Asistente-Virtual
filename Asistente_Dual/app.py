@@ -210,11 +210,12 @@ if col3.button("🌤️ Clima"):
         
         # set_mensaje( Mensaje_Escrito, Mensaje_Hablado )
         set_mensaje(
-            f"CDMX a {numero_grados}°C y el cielo está {c.lower()}.", 
-            f"O sea estamos a {numero_grados} grados centígrados y está {c.lower()} en la ciudad."
+            f"CDMX a {numero_grados}°C y el cielo está con {c.lower()}.", 
+            f"O sea estamos a {numero_grados}°C  y el cielo está con {c.lower()} en la ciudad.Pésimo para el cabello"
         )
     except:
         set_mensaje("Error de clima.", "No tengo el dato del clima ahorita.")
+        
 if col4.button("💵 Dólar"):
     try:
         d = yf.Ticker("MXN=X").history(period="1d")['Close'].iloc[-1]
