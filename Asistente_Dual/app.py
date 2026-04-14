@@ -14,7 +14,9 @@ import random
 st.set_page_config(page_title="Central de Mando", page_icon="🤖", layout="centered")
 
 zona_horaria = pytz.timezone('America/Mexico_City')
-Folder = './Musica/' 
+# --- RUTA INTELIGENTE PARA LA NUBE ---
+DIRECTORIO_BASE = os.path.dirname(os.path.abspath(__file__))
+Folder = os.path.join(DIRECTORIO_BASE, 'Musica')
 
 # --- 2. CLASES DE MÚSICA (Listas Ligadas) ---
 class Cancion:
