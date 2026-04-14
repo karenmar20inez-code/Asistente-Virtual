@@ -199,9 +199,15 @@ if col2.button("📅 Fecha"):
 
 if col3.button("🌤️ Clima"):
     try:
-        r = requests.get("https://wttr.in/Mexico+City?format=%t|%C", timeout=5)
+        # Aquí agregamos &lang=es al final del enlace de wttr.in
+        r = requests.get("https://wttr.in/Mexico+City?format=%t|%C&lang=es", timeout=5)
         t, c = unquote(r.text.strip()).replace('+', '').split('|')
-        set_mensaje(f"CDMX a {t} y {c}.", f"Hace {t} en la ciudad.")
+        
+        # Ajustamos para que suene súper natural en español
+        set_mensaje(
+            f"CDMX a {t} y el cielo está {c.lower()}.", 
+            f"Hace {t} y está {c.lower()} en la ciudad, gordi."
+        )
     except:
         set_mensaje("Error de clima.", "No tengo el dato del clima ahorita.")
 
