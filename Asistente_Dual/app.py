@@ -219,7 +219,7 @@ if col3.button("🌤️ Clima"):
 if col4.button("💵 Dólar"):
     try:
         d = yf.Ticker("MXN=X").history(period="1d")['Close'].iloc[-1]
-        set_mensaje(f"El dólar amaneció a {d:.2f} pesos.", f"El dólar está en {d:.2f} pesos.")
+        set_mensaje(f"El dólar amaneció a {d:.2f} pesos.", f"El dólar está en {d:.2f} pesos.Un súper precio neni")
     except:
         set_mensaje("Error bancario.", "El sistema financiero no responde.")
 
