@@ -1,0 +1,7 @@
+streamlit
+pytz
+requests
+yfinance
+pyjokes
+wikipedia-api
+edge-tts
