@@ -199,18 +199,18 @@ if col2.button("📅 Fecha"):
 
 if col3.button("🌤️ Clima"):
     try:
-        # Aquí agregamos &lang=es al final del enlace de wttr.in
         r = requests.get("https://wttr.in/Mexico+City?format=%t|%C&lang=es", timeout=5)
+        # --- LA MAGIA ESTÁ AQUÍ: Forzamos la codificación correcta ---
+        r.encoding = 'utf-8' 
+        
         t, c = unquote(r.text.strip()).replace('+', '').split('|')
         
-        # Ajustamos para que suene súper natural en español
         set_mensaje(
             f"CDMX a {t} y el cielo está {c.lower()}.", 
-            f"Hace {t} y está {c.lower()} en la ciudad, gordi."
+            f"Hace {t} y está {c.lower()} en la ciudad."
         )
     except:
         set_mensaje("Error de clima.", "No tengo el dato del clima ahorita.")
-
 if col4.button("💵 Dólar"):
     try:
         d = yf.Ticker("MXN=X").history(period="1d")['Close'].iloc[-1]
