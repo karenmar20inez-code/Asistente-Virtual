@@ -124,7 +124,6 @@ st.markdown(f"""
     [data-testid="stAlert"] {{ background-color: {card_bg} !important; color: {text_color} !important; border: 1px solid {color_tema} !important; }}
     .stTextInput input {{ background-color: {card_bg} !important; color: {text_color} !important; border: 1px solid {color_tema}55 !important; }}
     
-    /* Títulos Bonitos y Ajuste de Tamaño */
     .subtitulo-bonito {{
         color: {text_color};
         text-align: center;
@@ -246,8 +245,9 @@ with c_bt:
                     wiki = wikipediaapi.Wikipedia(user_agent="BotDual/1.0", language='es')
                     p = wiki.page(busqueda)
                     if p.exists():
-                        res = p.summary[:250]
-                        set_mensaje(f"Extracción completada. Resumen: {res}...", f"O sea, encontré esto súper rápido: {res}...")
+                        # Aquí está el filtro de limpieza para quitar saltos de línea molestos
+                        res = p.summary[:300].replace('\n', ' ').replace('\r', '').replace('"', '')
+                        set_mensaje(f"Extracción de datos completada. Resumen: {res}...", f"O sea, encontré esto súper rápido: {res}...")
                     else:
                         set_mensaje("Sin resultados en base de datos.", "Wikipedia no sabe de eso, gordi.")
                 except: 
@@ -262,7 +262,8 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 # --- REPRODUCTOR DE VOZ (JS) ---
 if st.session_state.hablar_texto:
-    texto = st.session_state.hablar_texto.replace('"', '').replace("'", "")
+    # Doble filtro para asegurar que NINGÚN caracter rompa el JavaScript
+    texto = st.session_state.hablar_texto.replace('"', '').replace("'", "").replace('\n', ' ').replace('\r', '')
     es_mujer_js = "true" if es_nexy else "false"
     components.html(f"""
     <script>
