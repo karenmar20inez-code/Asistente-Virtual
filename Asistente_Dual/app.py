@@ -124,7 +124,19 @@ st.markdown(f"""
     [data-testid="stAlert"] {{ background-color: {card_bg} !important; color: {text_color} !important; border: 1px solid {color_tema} !important; }}
     .stTextInput input {{ background-color: {card_bg} !important; color: {text_color} !important; border: 1px solid {color_tema}55 !important; }}
     
+    /* Títulos Bonitos */
+    .subtitulo-bonito {{
+        color: {text_color};
+        text-align: center;
+        font-size: 0.85rem;
+        font-weight: 300;
+        letter-spacing: 6px;
+        margin-bottom: -10px;
+        text-transform: uppercase;
+        opacity: 0.8;
+    }}
     .titulo {{ color: {color_tema}; text-align: center; font-weight: 900; letter-spacing: 4px; margin-bottom: 2rem; text-transform: uppercase; text-shadow: 0px 0px 15px {color_tema}; }}
+    
     .consola {{ padding: 20px; background: {card_bg}; border: 2px solid {color_tema}; border-radius: 12px; color: {text_color}; font-size: 1.1rem; text-align: center; margin-bottom: 2rem; box-shadow: 0 0 15px {color_resplandor}; }}
     
     div.stButton > button {{ background-color: transparent !important; color: {text_color} !important; border-radius: 10px !important; border: 2px solid {color_tema} !important; font-weight: bold !important; width: 100% !important; }}
@@ -147,6 +159,8 @@ st.markdown(f"""
     </style>
     """, unsafe_allow_html=True)
 
+# Título centrado y bonito
+st.markdown("<p class='subtitulo-bonito'>Asistente Virtual</p>", unsafe_allow_html=True)
 st.markdown(f"<h1 class='titulo'>{'✨ NEXY DIAMOND' if es_nexy else '🤖 CYBERX'}</h1>", unsafe_allow_html=True)
 
 # --- 6. PANEL DE CONTROL ---
@@ -241,7 +255,6 @@ if st.session_state.playlist.actual:
 
 col_sh, col_an, col_pl, col_si, col_re = st.columns(5)
 
-# --- BOTONES DINÁMICOS ON/OFF ---
 lbl_sh = "🔀 Aleatorio ON" if st.session_state.modo_aleatorio else "🔀 Aleatorio OFF"
 if col_sh.button(lbl_sh):
     st.session_state.modo_aleatorio = not st.session_state.modo_aleatorio
@@ -258,16 +271,11 @@ if col_an.button("⏮️ Anterior"):
     elif st.session_state.playlist.actual and st.session_state.playlist.actual.anterior:
         st.session_state.playlist.actual = st.session_state.playlist.actual.anterior
     st.session_state.reproduciendo = True
-    st.session_state.hablar_texto = "Regresando, gordi." if es_nexy else "Cargando pista anterior, jefe."
     st.rerun()
 
 lbl_p = "⏸️ Pausar" if st.session_state.reproduciendo else "▶️ Tocar"
 if col_pl.button(lbl_p):
     st.session_state.reproduciendo = not st.session_state.reproduciendo
-    if st.session_state.reproduciendo:
-        st.session_state.hablar_texto = "Música VIP en proceso." if es_nexy else "Dándole play al sistema."
-    else:
-        st.session_state.hablar_texto = "Música pausada." if es_nexy else "Audio muteado. Ahorrando RAM."
     st.rerun()
 
 if col_si.button("⏭️ Siguiente"):
@@ -283,14 +291,11 @@ if col_si.button("⏭️ Siguiente"):
     elif st.session_state.playlist.actual and st.session_state.playlist.actual.siguiente:
         st.session_state.playlist.actual = st.session_state.playlist.actual.siguiente
     st.session_state.reproduciendo = True
-    st.session_state.hablar_texto = "Siguiente hit." if es_nexy else "Saltando a la que sigue, jefe."
     st.rerun()
 
 lbl_r = "🔁 Repetir ON" if st.session_state.modo_repetir else "🔁 Repetir OFF"
 if col_re.button(lbl_r):
     st.session_state.modo_repetir = not st.session_state.modo_repetir
-    estado = "activada" if st.session_state.modo_repetir else "desactivada"
-    st.session_state.hablar_texto = f"Repetición {estado}." if es_nexy else f"Loop infinito {estado}."
     st.rerun()
 
 if st.session_state.playlist.actual:
@@ -300,7 +305,7 @@ if st.session_state.playlist.actual:
     except:
         contenedor_audio.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo)
 
-# --- 8. PIE DE PÁGINA (DERECHOS RESERVADOS) ---
+# --- 8. PIE DE PÁGINA ---
 st.markdown(f"""
     <div class="footer">
         © 2026 Nexus Dynamics Corp. Todos los derechos reservados.<br>
