@@ -14,6 +14,7 @@ import random
 st.set_page_config(page_title="Central de Mando", page_icon="🤖", layout="centered")
 
 zona_horaria = pytz.timezone('America/Mexico_City')
+
 # --- RUTA INTELIGENTE PARA LA NUBE ---
 DIRECTORIO_BASE = os.path.dirname(os.path.abspath(__file__))
 Folder = os.path.join(DIRECTORIO_BASE, 'Musica')
@@ -81,9 +82,9 @@ def guardar_nombre():
         
         nombre = st.session_state.nombre_usuario
         if "Nexy" in st.session_state.radio_asistente:
-            msg = f"O sea, ¡obvio te iba a saludar, {nombre}! Bienvenida a la Central Diamond. Pídeme lo que quieras."
+            msg = f"O sea, ¡obvio te iba a saludar, {nombre}! Bienvenida a la Central Diamond 💅✨💎. Pídeme lo que quieras."
         else:
-            msg = f"¡Qué rollo, {nombre}! Bienvenido a la Central de Mando de Elpidio. A la orden, patrón."
+            msg = f"¡Qué rollo, {nombre}! Bienvenido a la Central de Mando de Elpidio 🤠🚜🛠️. A la orden, patrón."
             
         st.session_state.mensaje = msg
         st.session_state.hablar_texto = msg
@@ -119,7 +120,7 @@ genero = st.sidebar.radio("🤖 Asistente:", ["👨 Elpidio", "💅 Nexy Diamond
 modo_oscuro = st.sidebar.toggle("🌙 Modo Oscuro", value=True)
 es_nexy = "Nexy" in genero
 
-# --- 5. DISEÑO SÚPER LLAMATIVO (ESTILO NEÓN) ---
+# --- 5. DISEÑO SÚPER LLAMATIVO Y RESPONSIVO ---
 if es_nexy:
     color_tema = "#FF007F" if modo_oscuro else "#D81B60"
     color_resplandor = "#FF007F66"
@@ -173,6 +174,32 @@ st.markdown(f"""
     div[data-baseweb="popover"] li:hover {{ background-color: {color_tema} !important; color: {btn_hover_text} !important; }}
     
     hr {{ border-top: 1px solid {color_tema}55; margin: 2rem 0; }}
+
+    /* =========================================================
+       MAGIA RESPONSIVA PARA CELULARES (GRID 3x2 PERFECTO)
+       ========================================================= */
+    @media (max-width: 768px) {{
+        div[data-testid="stHorizontalBlock"] {{
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+        }}
+        div[data-testid="column"] {{
+            width: auto !important;
+            min-width: 30% !important; /* Fuerza a que quepan exactamente 3 por línea */
+            flex: 1 1 30% !important;
+            padding: 3px !important; /* Espacio pequeñito entre botones */
+        }}
+        div.stButton > button {{
+            font-size: 0.75rem !important; /* Letra ajustada para pantallas pequeñas */
+            padding: 2px !important;
+            height: 45px !important;
+            white-space: nowrap !important; /* Evita que el texto se rompa feo */
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }}
+    }}
+    /* ========================================================= */
     </style>
     """, unsafe_allow_html=True)
 
@@ -199,27 +226,21 @@ if col2.button("📅 Fecha"):
 
 if col3.button("🌤️ Clima"):
     try:
-        # Agregamos '&m' para forzar grados Celsius y '&lang=es' para español
         r = requests.get("https://wttr.in/Mexico+City?format=%t|%C&m&lang=es", timeout=5)
         r.encoding = 'utf-8' 
-        
         t, c = unquote(r.text.strip()).replace('+', '').split('|')
-        
-        # Limpiamos el texto para quedarnos solo con el puro número
         numero_grados = t.replace('°C', '').replace('°F', '').replace('°', '').strip()
-        
-        # set_mensaje( Mensaje_Escrito, Mensaje_Hablado )
         set_mensaje(
-            f"CDMX a {numero_grados}°C y el cielo está con {c.lower()}.", 
-            f"O sea estamos a {numero_grados}°C  y el cielo está con {c.lower()} en la ciudad.Pésimo para el cabello"
+            f"CDMX a {numero_grados}°C y el cielo está {c.lower()}.", 
+            f"Hace {numero_grados} grados centígrados y está {c.lower()} en la ciudad."
         )
     except:
         set_mensaje("Error de clima.", "No tengo el dato del clima ahorita.")
-        
+
 if col4.button("💵 Dólar"):
     try:
         d = yf.Ticker("MXN=X").history(period="1d")['Close'].iloc[-1]
-        set_mensaje(f"El dólar amaneció a {d:.2f} pesos.", f"El dólar está en {d:.2f} pesos.Un súper precio neni")
+        set_mensaje(f"El dólar amaneció a {d:.2f} pesos.", f"El dólar está en {d:.2f} pesos.")
     except:
         set_mensaje("Error bancario.", "El sistema financiero no responde.")
 
@@ -298,7 +319,7 @@ with col_boton:
                     set_mensaje("Fallo de conexión.", "Wikipedia está fallando ahora mismo.")
         else:
             url = f"https://www.google.com/search?q={busqueda.replace(' ', '+')}" if motor == "Google" else f"https://www.youtube.com/results?search_query={busqueda.replace(' ', '+')}"
-            st.link_button(f"🚀 ABRIR EN {motor.upper()}", url, use_container_width=True)
+            st.link_button(f"🚀 ABRIR {motor.upper()}", url, use_container_width=True)
     else:
         st.button("BUSCAR", disabled=True, use_container_width=True)
 
@@ -328,7 +349,7 @@ if col_shuf.button(lbl_shuf, use_container_width=True):
     st.session_state.modo_aleatorio = not st.session_state.modo_aleatorio
     estado = "activado" if st.session_state.modo_aleatorio else "desactivado"
     st.session_state.hablar_texto = f"Modo aleatorio {estado}." if es_nexy else f"Aleatorio {estado}, patrón."
-    st.rerun() # <- ESTO FUERZA LA ACTUALIZACIÓN VISUAL INMEDIATA
+    st.rerun()
 
 # --- BOTÓN ANTERIOR ---
 if col_ant.button("⏮️ Anterior", use_container_width=True):
@@ -348,7 +369,7 @@ if col_ant.button("⏮️ Anterior", use_container_width=True):
 
     st.session_state.reproduciendo = True
     st.session_state.hablar_texto = "Regresando la canción, gordi." if es_nexy else "Va pa'trás la rola, patrón."
-    st.rerun() # <- ESTO FUERZA LA ACTUALIZACIÓN VISUAL INMEDIATA
+    st.rerun()
 
 # --- BOTÓN PLAY/PAUSA ---
 if col_play.button("⏯️ Pausa/Play", use_container_width=True):
@@ -357,7 +378,7 @@ if col_play.button("⏯️ Pausa/Play", use_container_width=True):
         st.session_state.hablar_texto = "Reproduciendo música VIP." if es_nexy else "A darle a la música, mai."
     else:
         st.session_state.hablar_texto = "Música pausada." if es_nexy else "Silencio en la cabina."
-    st.rerun() # <- ESTO FUERZA LA ACTUALIZACIÓN VISUAL INMEDIATA
+    st.rerun()
 
 # --- BOTÓN SIGUIENTE ---
 if col_sig.button("⏭️ Siguiente", use_container_width=True):
@@ -380,7 +401,7 @@ if col_sig.button("⏭️ Siguiente", use_container_width=True):
 
     st.session_state.reproduciendo = True
     st.session_state.hablar_texto = "Siguiente hit, obvio." if es_nexy else "La que sigue, primo."
-    st.rerun() # <- ESTO FUERZA LA ACTUALIZACIÓN VISUAL INMEDIATA
+    st.rerun()
 
 # --- BOTÓN REPETIR ---
 lbl_rep = "🔁 Repetir: ON" if st.session_state.modo_repetir else "🔁 Repetir: OFF"
@@ -388,7 +409,7 @@ if col_rep.button(lbl_rep, use_container_width=True):
     st.session_state.modo_repetir = not st.session_state.modo_repetir
     estado = "activada" if st.session_state.modo_repetir else "desactivada"
     st.session_state.hablar_texto = f"Repetición {estado}." if es_nexy else f"Bucle {estado}, listo."
-    st.rerun() # <- ESTO FUERZA LA ACTUALIZACIÓN VISUAL INMEDIATA
+    st.rerun()
 
 # --- REPRODUCTOR DE AUDIO FINAL ---
 if st.session_state.playlist.actual:
