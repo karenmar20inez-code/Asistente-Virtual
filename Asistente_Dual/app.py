@@ -102,25 +102,68 @@ genero = st.sidebar.radio("🤖 Asistente:", ["👨 Cyberx", "💅 Nexy Diamond"
 modo_oscuro = st.sidebar.toggle("🌙 Modo Oscuro", value=True)
 es_nexy = "Nexy" in genero
 
-# --- 5. DISEÑO RESPONSIVO ---
+# --- 5. DISEÑO RESPONSIVO Y MODO OSCURO TOTAL ---
 color_tema = "#FF007F" if es_nexy else "#00E5FF"
 color_resplandor = f"{color_tema}66"
-bg_color = "#0a0a0c" if modo_oscuro else "#ffffff"
+
+# Paleta de colores dinámicos (Claro/Oscuro)
+bg_color = "#0a0a0c" if modo_oscuro else "#f8f9fa"
+sidebar_color = "#111114" if modo_oscuro else "#ffffff"
 text_color = "#ffffff" if modo_oscuro else "#1e1e1e"
-card_bg = "#16161a" if modo_oscuro else "#f0f0f0"
+card_bg = "#16161a" if modo_oscuro else "#ffffff"
 
 st.markdown(f"""
     <style>
-    .stApp {{ background-color: {bg_color}; color: {text_color}; font-family: 'Inter', sans-serif; }}
+    /* Fondo principal de la App */
+    .stApp, [data-testid="stAppViewContainer"] {{ 
+        background-color: {bg_color} !important; 
+        color: {text_color} !important; 
+        font-family: 'Inter', sans-serif; 
+    }}
+    
+    /* 1. Control Total de la Barra Lateral (Sidebar) */
+    [data-testid="stSidebar"] {{ 
+        background-color: {sidebar_color} !important; 
+        border-right: 1px solid {color_tema}55 !important; 
+    }}
+    [data-testid="stSidebarContent"] * {{ 
+        color: {text_color} !important; 
+    }}
+    
+    /* 2. Control Total de la Barra Superior (Header e Iconos) */
+    [data-testid="stHeader"] {{ 
+        background-color: {bg_color} !important; 
+    }}
+    [data-testid="stHeader"] * {{ 
+        color: {text_color} !important; 
+        fill: {text_color} !important; /* Para pintar los SVG como el gatito de GitHub */
+    }}
+    
+    /* 3. Control de Cajas de Éxito (Success box del usuario) y Texto */
+    [data-testid="stAlert"] {{ 
+        background-color: {card_bg} !important; 
+        color: {text_color} !important; 
+        border: 1px solid {color_tema} !important; 
+    }}
+    .stTextInput input {{ 
+        background-color: {card_bg} !important; 
+        color: {text_color} !important; 
+        border: 1px solid {color_tema}55 !important; 
+    }}
+    
+    /* Textos y Consola */
     .titulo {{ color: {color_tema}; text-align: center; font-weight: 900; letter-spacing: 4px; margin-bottom: 2rem; text-transform: uppercase; text-shadow: 0px 0px 15px {color_tema}; }}
     .consola {{ padding: 20px; background: {card_bg}; border: 2px solid {color_tema}; border-radius: 12px; color: {text_color}; font-size: 1.1rem; text-align: center; margin-bottom: 2rem; box-shadow: 0 0 15px {color_resplandor}; }}
+    
+    /* Botones */
     div.stButton > button {{ background-color: transparent !important; color: {text_color} !important; border-radius: 10px !important; border: 2px solid {color_tema} !important; font-weight: bold !important; width: 100% !important; }}
     div.stButton > button:hover {{ background-color: {color_tema} !important; color: #000 !important; box-shadow: 0 0 10px {color_tema} !important; }}
     
+    /* Celulares Responsivo */
     @media screen and (max-width: 768px) {{
         div[data-testid="stHorizontalBlock"] {{ display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 8px !important; justify-content: center !important; }}
         div[data-testid="column"] {{ flex: 0 0 30% !important; min-width: 30% !important; max-width: 32% !important; padding: 0 !important; }}
-        div.stButton > button {{ font-size: 10px !important; height: 40px !important; min-height: 40px !important; }}
+        div.stButton > button {{ font-size: 10px !important; height: 40px !important; min-height: 40px !important; padding: 0 2px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }}
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -204,7 +247,7 @@ if st.session_state.hablar_texto:
 st.markdown(f"<h3 style='text-align:center; color:{color_tema};'>📻 Reproductor Musical</h3>", unsafe_allow_html=True)
 
 if st.session_state.playlist.actual:
-    st.markdown(f"<div style='text-align:center; padding:15px; border:1px solid {color_tema}; border-radius:10px;'>🎵 <b>SONANDO:</b> {st.session_state.playlist.actual.cancion.nombre}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align:center; padding:15px; border:1px solid {color_tema}; border-radius:10px; background-color: {card_bg}; color: {text_color};'>🎵 <b>SONANDO:</b> {st.session_state.playlist.actual.cancion.nombre}</div><br>", unsafe_allow_html=True)
 
 col_sh, col_an, col_pl, col_si, col_re = st.columns(5)
 
