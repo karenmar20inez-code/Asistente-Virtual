@@ -278,7 +278,7 @@ if st.session_state.playlist.actual:
 # --- 8. PIE DE PÁGINA (DERECHOS RESERVADOS) ---
 st.markdown(f"""
     <div class="footer">
-        © 2026 Karen Lizette Correa Martínez. Todos los derechos reservados.<br>
+        © 2026 Nexus Dynamics Corp. Todos los derechos reservados.<br>
         📧 Contacto Técnico: <a href="mailto:soporte.especializado@ingenieros.system.premium" style="color:{color_tema}; text-decoration:none;">soporte.especializado@ingenieros.system.premium</a>
     </div>
 """, unsafe_allow_html=True)
