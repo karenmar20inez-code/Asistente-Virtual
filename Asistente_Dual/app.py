@@ -160,12 +160,15 @@ st.markdown(f"""
             max-width: 32% !important;
             padding: 0 !important;
         }}
-        /* Botones compactos para que quepan 3 */
+        /* Botones compactos para que quepan los textos en iPhone */
         div.stButton > button {{
-            font-size: 10px !important;
+            font-size: 11px !important;
             height: 40px !important;
             min-height: 40px !important;
-            padding: 0 !important;
+            padding: 0 2px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
         }}
         /* Ajuste para el buscador (2 columnas en móvil) */
         .buscador-grid div[data-testid="column"] {{
@@ -251,7 +254,6 @@ if st.session_state.hablar_texto:
 st.markdown("#### 🔍 Explorar")
 motor = st.radio("Motor:", ["Google", "YouTube", "Wikipedia"], horizontal=True)
 
-# Contenedor especial para el buscador responsivo
 st.markdown('<div class="buscador-grid">', unsafe_allow_html=True)
 c_in, c_bt = st.columns(2)
 with c_in:
@@ -283,35 +285,74 @@ st.markdown(f"<h3 style='text-align:center; color:{color_tema};'>📻 Reproducto
 if st.session_state.playlist.actual:
     st.markdown(f"""
         <div style='text-align:center; padding: 15px; border-radius: 12px; background: {card_bg}; border: 1px solid {color_tema};'>
-            <div style='font-size: 0.8rem; color:{color_tema};'>🎵 SONANDO</div>
+            <div style='font-size: 0.8rem; color:{color_tema}; font-weight: bold;'>🎵 SONANDO</div>
             <div style='font-size: 1.1rem; font-weight: bold;'>{st.session_state.playlist.actual.cancion.nombre}</div>
         </div>
     """, unsafe_allow_html=True)
 
+# 5 Columnas para los botones
 col_sh, col_an, col_pl, col_si, col_re = st.columns(5)
 
-if col_sh.button("🔀", help="Aleatorio"):
+# 1. BOTÓN ALEATORIO (MIX)
+lbl_shuf = "🔀 Mix ON" if st.session_state.modo_aleatorio else "🔀 Mix OFF"
+if col_sh.button(lbl_shuf, use_container_width=True):
     st.session_state.modo_aleatorio = not st.session_state.modo_aleatorio
     st.rerun()
-if col_an.button("⏮️"):
-    if st.session_state.playlist.actual:
-        if st.session_state.modo_aleatorio:
-            # Lógica simple de aleatorio
-            pass 
-        st.session_state.reproduciendo = True
-        st.rerun()
-if col_pl.button("⏯️"):
+
+# 2. BOTÓN ANTERIOR
+if col_an.button("⏮️ Anterior", use_container_width=True):
+    if st.session_state.modo_aleatorio:
+        nodos = []
+        temp = st.session_state.playlist.cabeza
+        while temp:
+            nodos.append(temp)
+            temp = temp.siguiente
+        if nodos:
+            st.session_state.playlist.actual = random.choice(nodos)
+    else:
+        if st.session_state.playlist.actual and st.session_state.playlist.actual.anterior:
+            st.session_state.playlist.actual = st.session_state.playlist.actual.anterior
+        elif st.session_state.playlist.actual and st.session_state.modo_repetir:
+            st.session_state.playlist.actual = st.session_state.playlist.cola
+    st.session_state.reproduciendo = True
+    st.rerun()
+
+# 3. BOTÓN PLAY/PAUSA DINÁMICO
+lbl_play = "⏸️ Pausar" if st.session_state.reproduciendo else "▶️ Reproducir"
+if col_pl.button(lbl_play, use_container_width=True):
     st.session_state.reproduciendo = not st.session_state.reproduciendo
     st.rerun()
-if col_si.button("⏭️"):
-    if st.session_state.playlist.actual:
-        if st.session_state.playlist.actual.siguiente:
+
+# 4. BOTÓN SIGUIENTE
+if col_si.button("⏭️ Siguiente", use_container_width=True):
+    if st.session_state.modo_aleatorio:
+        nodos = []
+        temp = st.session_state.playlist.cabeza
+        while temp:
+            nodos.append(temp)
+            temp = temp.siguiente
+        if nodos:
+            nuevo = random.choice(nodos)
+            while len(nodos) > 1 and nuevo == st.session_state.playlist.actual:
+                nuevo = random.choice(nodos)
+            st.session_state.playlist.actual = nuevo
+    else:
+        if st.session_state.playlist.actual and st.session_state.playlist.actual.siguiente:
             st.session_state.playlist.actual = st.session_state.playlist.actual.siguiente
-        st.session_state.reproduciendo = True
-        st.rerun()
-if col_re.button("🔁"):
+        elif st.session_state.playlist.actual and st.session_state.modo_repetir:
+            st.session_state.playlist.actual = st.session_state.playlist.cabeza
+    st.session_state.reproduciendo = True
+    st.rerun()
+
+# 5. BOTÓN REPETIR (BUCLE)
+lbl_rep = "🔁 Bucle ON" if st.session_state.modo_repetir else "🔁 Bucle OFF"
+if col_re.button(lbl_rep, use_container_width=True):
     st.session_state.modo_repetir = not st.session_state.modo_repetir
     st.rerun()
 
+# REPRODUCTOR DE AUDIO NATIVO
 if st.session_state.playlist.actual:
-    st.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo)
+    try:
+        st.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo, loop=st.session_state.modo_repetir)
+    except:
+        st.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo)
