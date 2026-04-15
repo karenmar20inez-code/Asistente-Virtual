@@ -109,7 +109,6 @@ es_nexy = "Nexy" in genero
 color_tema = "#FF007F" if es_nexy else "#00E5FF"
 color_resplandor = f"{color_tema}66"
 
-# Paleta dinámica
 bg_color = "#0a0a0c" if modo_oscuro else "#f8f9fa"
 sidebar_color = "#111114" if modo_oscuro else "#ffffff"
 text_color = "#ffffff" if modo_oscuro else "#1e1e1e"
@@ -143,7 +142,6 @@ st.markdown(f"<h1 class='titulo'>{'✨ NEXY DIAMOND' if es_nexy else '🤖 CYBER
 
 # --- 6. PANEL DE CONTROL (AUTO-PAUSA) ---
 def set_mensaje(msg_cyberx, msg_nexy):
-    # Esto apaga la música automáticamente si pides la hora, clima, etc.
     st.session_state.reproduciendo = False 
     respuesta = msg_nexy if es_nexy else msg_cyberx
     st.session_state.mensaje = respuesta
@@ -187,7 +185,7 @@ if col6.button("🗑️ Borrar"):
 
 st.markdown(f"<div class='consola'>{st.session_state.mensaje}</div>", unsafe_allow_html=True)
 
-# --- REPRODUCTOR DE VOZ (JS NATIVO) ---
+# --- REPRODUCTOR DE VOZ CON RECONOCIMIENTO DE GÉNERO Y TONO ---
 if st.session_state.hablar_texto:
     texto = st.session_state.hablar_texto.replace('"', '').replace("'", "")
     es_mujer_js = "true" if es_nexy else "false"
@@ -197,14 +195,31 @@ if st.session_state.hablar_texto:
         var msg = new SpeechSynthesisUtterance("{texto}");
         var voices = window.speechSynthesis.getVoices();
         var esMujer = {es_mujer_js};
+        
+        // Filtramos solo las voces en español
         var spanV = voices.filter(v => v.lang.startsWith('es'));
-        
-        var vEle = esMujer 
-            ? spanV.find(v => v.name.includes('Monica') || v.name.includes('Helena') || v.name.includes('Paulina')) 
-            : spanV.find(v => v.name.includes('Raul') || v.name.includes('Jorge') || v.name.includes('Diego'));
-        
-        if(!vEle && spanV.length > 0) vEle = spanV[0];
-        if(vEle) msg.voice = vEle;
+        var vEle = null;
+
+        if (esMujer) {{
+            // Nombres de mujer comunes en iOS, Windows y Android
+            vEle = spanV.find(v => /monica|paulina|helena|sabina|dalia|margarita|lucia|mujer|female/i.test(v.name));
+        }} else {{
+            // Nombres de hombre comunes en iOS, Windows y Android
+            vEle = spanV.find(v => /jorge|diego|juan|raul|pablo|carlos|hombre|male/i.test(v.name));
+        }}
+
+        // Si encuentra la voz exacta, la asigna. Si no, usa el modificador de Tono (Pitch)
+        if (vEle) {{
+            msg.voice = vEle;
+            msg.pitch = 1.0;
+        }} else if (spanV.length > 0) {{
+            msg.voice = spanV[0];
+            msg.pitch = esMujer ? 1.5 : 0.6; // 1.5 Agudo (Mujer), 0.6 Grave (Hombre)
+        }} else {{
+            msg.lang = 'es-MX';
+            msg.pitch = esMujer ? 1.5 : 0.6;
+        }}
+
         msg.rate = 1.0;
         window.speechSynthesis.speak(msg);
     </script>
@@ -212,7 +227,7 @@ if st.session_state.hablar_texto:
     st.session_state.hablar_texto = ""
 
 # ==========================================
-# --- 7. REPRODUCTOR MUSICAL SIN ERRORES ---
+# --- 7. REPRODUCTOR MUSICAL CORREGIDO ---
 # ==========================================
 st.markdown(f"<h3 style='text-align:center; color:{color_tema};'>📻 Reproductor Musical</h3>", unsafe_allow_html=True)
 
@@ -271,7 +286,7 @@ if col_si.button("⏭️ Siguiente"):
     st.session_state.hablar_texto = "Siguiente hit." if es_nexy else "Saltando a la que sigue, jefe."
     st.rerun()
 
-# 5. REPETIR (BUCLE)
+# 5. REPETIR 
 lbl_r = "🔁 Repetir ON" if st.session_state.modo_repetir else "🔁 Repet. OFF"
 if col_re.button(lbl_r):
     st.session_state.modo_repetir = not st.session_state.modo_repetir
@@ -279,13 +294,10 @@ if col_re.button(lbl_r):
     st.session_state.hablar_texto = f"Repetición {estado}." if es_nexy else f"Loop infinito {estado}."
     st.rerun()
 
-# AUDIO CON 'KEY' ÚNICA (ESTO EVITA QUE SE JUNTEN DOS CANCIONES)
+# AUDIO CON ST.EMPTY PARA QUE NO SE EMPALMEN
 if st.session_state.playlist.actual:
-    # Creamos un ID único usando el nombre de la canción. Si cambias de canción, se borra el audio viejo.
-    llave_audio = f"audio_{st.session_state.playlist.actual.cancion.nombre}"
-    
+    contenedor_audio = st.empty()
     try:
-        st.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo, loop=st.session_state.modo_repetir, key=llave_audio)
+        contenedor_audio.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo, loop=st.session_state.modo_repetir)
     except:
-        # Por si falla el loop en versiones anteriores de Streamlit
-        st.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo, key=llave_audio)
+        contenedor_audio.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo)
