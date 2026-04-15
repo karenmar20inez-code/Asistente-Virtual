@@ -58,7 +58,7 @@ if 'playlist' not in st.session_state:
             st.session_state.playlist.agregar_final(Cancion(os.path.splitext(a)[0], os.path.join(Folder, a)))
 
 if 'mensaje' not in st.session_state:
-    st.session_state.mensaje = "Esperando órdenes..."
+    st.session_state.mensaje = "Sistemas en espera..."
 if 'hablar_texto' not in st.session_state:
     st.session_state.hablar_texto = "" 
 if 'nombre_usuario' not in st.session_state:
@@ -70,7 +70,7 @@ if 'modo_aleatorio' not in st.session_state:
 if 'modo_repetir' not in st.session_state:
     st.session_state.modo_repetir = False
 
-# --- FUNCIONES DE VOZ Y ASISTENTE ---
+# --- FUNCIONES DE VOZ Y ASISTENTE (PERSONALIDAD CYBERX/NEXY) ---
 def guardar_nombre():
     if st.session_state.widget_nombre:
         st.session_state.nombre_usuario = st.session_state.widget_nombre.title()
@@ -79,7 +79,7 @@ def guardar_nombre():
         if "Nexy" in st.session_state.radio_asistente:
             msg = f"¡Obvio te iba a saludar, {nombre}! Bienvenida a la Central Diamond 💅✨. Pídeme lo que quieras."
         else:
-            msg = f"Sistemas en línea, {nombre}. Cyberx a tu servicio 🤖🛠️. ¿Qué ejecutamos?"
+            msg = f"¡Qué rollo, {nombre}! Cyberx en línea. Los servidores están al 100 y listos para el jale, jefe 🤖💻."
         st.session_state.mensaje = msg
         st.session_state.hablar_texto = msg
 
@@ -87,16 +87,19 @@ def cambio_asistente():
     nombre = st.session_state.nombre_usuario
     es_nexy_nuevo = "Nexy" in st.session_state.radio_asistente
     if nombre:
-        msg = f"Cambio de turno. Ahora estás con {'Nexy Diamond' if es_nexy_nuevo else 'Cyberx'}, {nombre}."
+        if es_nexy_nuevo:
+            msg = f"Cambio de turno. Ahora estás con Nexy Diamond, gordi."
+        else:
+            msg = f"Cargando interfaz de Cyberx... Listo, jefe. Modo hacker activado 🚀."
     else:
-        msg = "Cambiando interfaz de asistente."
+        msg = "Cambiando protocolos de asistente."
     st.session_state.mensaje = msg
     st.session_state.hablar_texto = msg
 
 # --- 4. BARRA LATERAL ---
 st.sidebar.markdown("### ⚙️ Configuración")
 if st.session_state.nombre_usuario:
-    st.sidebar.success(f"👤 Usuario: **{st.session_state.nombre_usuario}**")
+    st.sidebar.success(f"👤 Usuario VIP: **{st.session_state.nombre_usuario}**")
 st.sidebar.text_input("Ingresa tu nombre:", key="widget_nombre", on_change=guardar_nombre)
 genero = st.sidebar.radio("🤖 Asistente:", ["👨 Cyberx", "💅 Nexy Diamond"], key="radio_asistente", on_change=cambio_asistente)
 modo_oscuro = st.sidebar.toggle("🌙 Modo Oscuro", value=True)
@@ -106,7 +109,7 @@ es_nexy = "Nexy" in genero
 color_tema = "#FF007F" if es_nexy else "#00E5FF"
 color_resplandor = f"{color_tema}66"
 
-# Paleta de colores dinámicos (Claro/Oscuro)
+# Paleta dinámica
 bg_color = "#0a0a0c" if modo_oscuro else "#f8f9fa"
 sidebar_color = "#111114" if modo_oscuro else "#ffffff"
 text_color = "#ffffff" if modo_oscuro else "#1e1e1e"
@@ -114,52 +117,20 @@ card_bg = "#16161a" if modo_oscuro else "#ffffff"
 
 st.markdown(f"""
     <style>
-    /* Fondo principal de la App */
-    .stApp, [data-testid="stAppViewContainer"] {{ 
-        background-color: {bg_color} !important; 
-        color: {text_color} !important; 
-        font-family: 'Inter', sans-serif; 
-    }}
+    .stApp, [data-testid="stAppViewContainer"] {{ background-color: {bg_color} !important; color: {text_color} !important; font-family: 'Inter', sans-serif; }}
+    [data-testid="stSidebar"] {{ background-color: {sidebar_color} !important; border-right: 1px solid {color_tema}55 !important; }}
+    [data-testid="stSidebarContent"] * {{ color: {text_color} !important; }}
+    [data-testid="stHeader"] {{ background-color: {bg_color} !important; }}
+    [data-testid="stHeader"] * {{ color: {text_color} !important; fill: {text_color} !important; }}
+    [data-testid="stAlert"] {{ background-color: {card_bg} !important; color: {text_color} !important; border: 1px solid {color_tema} !important; }}
+    .stTextInput input {{ background-color: {card_bg} !important; color: {text_color} !important; border: 1px solid {color_tema}55 !important; }}
     
-    /* 1. Control Total de la Barra Lateral (Sidebar) */
-    [data-testid="stSidebar"] {{ 
-        background-color: {sidebar_color} !important; 
-        border-right: 1px solid {color_tema}55 !important; 
-    }}
-    [data-testid="stSidebarContent"] * {{ 
-        color: {text_color} !important; 
-    }}
-    
-    /* 2. Control Total de la Barra Superior (Header e Iconos) */
-    [data-testid="stHeader"] {{ 
-        background-color: {bg_color} !important; 
-    }}
-    [data-testid="stHeader"] * {{ 
-        color: {text_color} !important; 
-        fill: {text_color} !important; /* Para pintar los SVG como el gatito de GitHub */
-    }}
-    
-    /* 3. Control de Cajas de Éxito (Success box del usuario) y Texto */
-    [data-testid="stAlert"] {{ 
-        background-color: {card_bg} !important; 
-        color: {text_color} !important; 
-        border: 1px solid {color_tema} !important; 
-    }}
-    .stTextInput input {{ 
-        background-color: {card_bg} !important; 
-        color: {text_color} !important; 
-        border: 1px solid {color_tema}55 !important; 
-    }}
-    
-    /* Textos y Consola */
     .titulo {{ color: {color_tema}; text-align: center; font-weight: 900; letter-spacing: 4px; margin-bottom: 2rem; text-transform: uppercase; text-shadow: 0px 0px 15px {color_tema}; }}
     .consola {{ padding: 20px; background: {card_bg}; border: 2px solid {color_tema}; border-radius: 12px; color: {text_color}; font-size: 1.1rem; text-align: center; margin-bottom: 2rem; box-shadow: 0 0 15px {color_resplandor}; }}
     
-    /* Botones */
     div.stButton > button {{ background-color: transparent !important; color: {text_color} !important; border-radius: 10px !important; border: 2px solid {color_tema} !important; font-weight: bold !important; width: 100% !important; }}
     div.stButton > button:hover {{ background-color: {color_tema} !important; color: #000 !important; box-shadow: 0 0 10px {color_tema} !important; }}
     
-    /* Celulares Responsivo */
     @media screen and (max-width: 768px) {{
         div[data-testid="stHorizontalBlock"] {{ display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 8px !important; justify-content: center !important; }}
         div[data-testid="column"] {{ flex: 0 0 30% !important; min-width: 30% !important; max-width: 32% !important; padding: 0 !important; }}
@@ -170,9 +141,9 @@ st.markdown(f"""
 
 st.markdown(f"<h1 class='titulo'>{'✨ NEXY DIAMOND' if es_nexy else '🤖 CYBERX'}</h1>", unsafe_allow_html=True)
 
-# --- 6. PANEL DE CONTROL (CON AUTO-PAUSA) ---
+# --- 6. PANEL DE CONTROL (AUTO-PAUSA) ---
 def set_mensaje(msg_cyberx, msg_nexy):
-    # Función para pausar música al pedir info
+    # Esto apaga la música automáticamente si pides la hora, clima, etc.
     st.session_state.reproduciendo = False 
     respuesta = msg_nexy if es_nexy else msg_cyberx
     st.session_state.mensaje = respuesta
@@ -183,12 +154,12 @@ col4, col5, col6 = st.columns(3)
 
 if col1.button("⌚ Hora"):
     ahora = datetime.datetime.now(zona_horaria).strftime('%H:%M')
-    set_mensaje(f"Tiempo del sistema: {ahora}.", f"Son las {ahora}, gordi. El tiempo vuela.")
+    set_mensaje(f"Son las {ahora}. El reloj del CPU va que vuela, jefe.", f"Son las {ahora}, gordi. El tiempo vuela.")
 
 if col2.button("📅 Fecha"):
     dia = datetime.date.today()
     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
-    set_mensaje(f"Fecha actual: {dia.day} de {meses[dia.month-1]}.", f"Hoy es {dia.day} de {meses[dia.month-1]}, obvio.")
+    set_mensaje(f"Hoy es {dia.day} de {meses[dia.month-1]}. Registrado en la base de datos.", f"Hoy es {dia.day} de {meses[dia.month-1]}, obvio.")
 
 if col3.button("🌤️ Clima"):
     try:
@@ -196,27 +167,27 @@ if col3.button("🌤️ Clima"):
         r.encoding = 'utf-8' 
         t, c = unquote(r.text.strip()).replace('+', '').split('|')
         num = t.replace('°C', '').strip()
-        set_mensaje(f"Sensores indican {num} grados centígrados y {c.lower()}.", f"Hace {num} grados centígrados y está {c.lower()} en la ciudad.")
+        set_mensaje(f"Sensores marcan {num} grados y está {c.lower()}. No se me vaya a sobrecalentar el sistema.", f"Hace {num} grados centígrados y está {c.lower()} en la ciudad.")
     except:
-        set_mensaje("Error en sensores climáticos.", "No tengo el clima ahora, gordi.")
+        set_mensaje("Fallo de red en sensores climáticos.", "No tengo el clima ahora, gordi.")
 
 if col4.button("💵 Dólar"):
     try:
         d = yf.Ticker("MXN=X").history(period="1d")['Close'].iloc[-1]
-        set_mensaje(f"Divisa: 1 dólar es igual a {d:.2f} pesos mexicanos.", f"El dólar está en {d:.2f} pesos. ¡Carísimo!")
+        set_mensaje(f"El dólar está a {d:.2f} pesitos. Ni hackeando el banco nos hacemos ricos hoy, jefe.", f"El dólar está en {d:.2f} pesos. ¡Carísimo!")
     except:
-        set_mensaje("Error de conexión financiera.", "No sé en cuánto está el dólar hoy.")
+        set_mensaje("Servidor bancario no responde.", "No sé en cuánto está el dólar hoy.")
 
 if col5.button("😂 Chiste"):
     chiste = pyjokes.get_joke('es')
-    set_mensaje(chiste, f"O sea, escucha este chiste: {chiste}")
+    set_mensaje(f"Ahí le va un chiste de programador: {chiste}. Ba-dum-tss.", f"O sea, escucha este chiste: {chiste}")
 
 if col6.button("🗑️ Borrar"):
-    set_mensaje("Buffer limpio. Pantalla en blanco.", "Todo limpio y perfecto como yo.")
+    set_mensaje("Buffer formateado. Todo limpio, jefe.", "Todo limpio y perfecto como yo.")
 
 st.markdown(f"<div class='consola'>{st.session_state.mensaje}</div>", unsafe_allow_html=True)
 
-# --- REPRODUCTOR DE VOZ NATIVO (Diferencia Hombre/Mujer) ---
+# --- REPRODUCTOR DE VOZ (JS NATIVO) ---
 if st.session_state.hablar_texto:
     texto = st.session_state.hablar_texto.replace('"', '').replace("'", "")
     es_mujer_js = "true" if es_nexy else "false"
@@ -228,7 +199,6 @@ if st.session_state.hablar_texto:
         var esMujer = {es_mujer_js};
         var spanV = voices.filter(v => v.lang.startsWith('es'));
         
-        // Selección de voz por género
         var vEle = esMujer 
             ? spanV.find(v => v.name.includes('Monica') || v.name.includes('Helena') || v.name.includes('Paulina')) 
             : spanV.find(v => v.name.includes('Raul') || v.name.includes('Jorge') || v.name.includes('Diego'));
@@ -242,7 +212,7 @@ if st.session_state.hablar_texto:
     st.session_state.hablar_texto = ""
 
 # ==========================================
-# --- 7. REPRODUCTOR MUSICAL CON VOZ ---
+# --- 7. REPRODUCTOR MUSICAL SIN ERRORES ---
 # ==========================================
 st.markdown(f"<h3 style='text-align:center; color:{color_tema};'>📻 Reproductor Musical</h3>", unsafe_allow_html=True)
 
@@ -251,14 +221,15 @@ if st.session_state.playlist.actual:
 
 col_sh, col_an, col_pl, col_si, col_re = st.columns(5)
 
-# MIX / ALEATORIO
-lbl_sh = "🔀 Mix ON" if st.session_state.modo_aleatorio else "🔀 Mix OFF"
+# 1. ALEATORIO
+lbl_sh = "🔀 Aleat. ON" if st.session_state.modo_aleatorio else "🔀 Aleat. OFF"
 if col_sh.button(lbl_sh):
     st.session_state.modo_aleatorio = not st.session_state.modo_aleatorio
-    st.session_state.hablar_texto = f"Modo aleatorio {'activado' if st.session_state.modo_aleatorio else 'desactivado'}."
+    estado = "activado" if st.session_state.modo_aleatorio else "desactivado"
+    st.session_state.hablar_texto = f"Modo aleatorio {estado}." if es_nexy else f"Algoritmo aleatorio {estado}, jefe."
     st.rerun()
 
-# ANTERIOR
+# 2. ANTERIOR
 if col_an.button("⏮️ Anterior"):
     if st.session_state.modo_aleatorio:
         nodos = []
@@ -268,35 +239,53 @@ if col_an.button("⏮️ Anterior"):
     elif st.session_state.playlist.actual and st.session_state.playlist.actual.anterior:
         st.session_state.playlist.actual = st.session_state.playlist.actual.anterior
     st.session_state.reproduciendo = True
-    st.session_state.hablar_texto = "Poniendo la canción anterior."
+    st.session_state.hablar_texto = "Regresando, gordi." if es_nexy else "Cargando pista anterior, jefe."
     st.rerun()
 
-# PLAY / PAUSE
+# 3. PLAY / PAUSE
 lbl_p = "⏸️ Pausar" if st.session_state.reproduciendo else "▶️ Tocar"
 if col_pl.button(lbl_p):
     st.session_state.reproduciendo = not st.session_state.reproduciendo
-    st.session_state.hablar_texto = "Música pausada." if not st.session_state.reproduciendo else "Reproduciendo música."
+    if st.session_state.reproduciendo:
+        st.session_state.hablar_texto = "Música VIP en proceso." if es_nexy else "Dándole play al sistema."
+    else:
+        st.session_state.hablar_texto = "Música pausada." if es_nexy else "Audio muteado. Ahorrando RAM."
     st.rerun()
 
-# SIGUIENTE
+# 4. SIGUIENTE
 if col_si.button("⏭️ Siguiente"):
     if st.session_state.modo_aleatorio:
         nodos = []
         t = st.session_state.playlist.cabeza
         while t: nodos.append(t); t = t.siguiente
-        st.session_state.playlist.actual = random.choice(nodos)
+        if nodos:
+            nuevo = random.choice(nodos)
+            intentos = 0
+            while len(nodos) > 1 and nuevo == st.session_state.playlist.actual and intentos < 5:
+                nuevo = random.choice(nodos)
+                intentos += 1
+            st.session_state.playlist.actual = nuevo
     elif st.session_state.playlist.actual and st.session_state.playlist.actual.siguiente:
         st.session_state.playlist.actual = st.session_state.playlist.actual.siguiente
     st.session_state.reproduciendo = True
-    st.session_state.hablar_texto = "Siguiente canción en la lista."
+    st.session_state.hablar_texto = "Siguiente hit." if es_nexy else "Saltando a la que sigue, jefe."
     st.rerun()
 
-# BUCLE / REPETIR
-lbl_r = "🔁 Bucle ON" if st.session_state.modo_repetir else "🔁 Bucle OFF"
+# 5. REPETIR (BUCLE)
+lbl_r = "🔁 Repetir ON" if st.session_state.modo_repetir else "🔁 Repet. OFF"
 if col_re.button(lbl_r):
     st.session_state.modo_repetir = not st.session_state.modo_repetir
-    st.session_state.hablar_texto = f"Repetición {'activada' if st.session_state.modo_repetir else 'desactivada'}."
+    estado = "activada" if st.session_state.modo_repetir else "desactivada"
+    st.session_state.hablar_texto = f"Repetición {estado}." if es_nexy else f"Loop infinito {estado}."
     st.rerun()
 
+# AUDIO CON 'KEY' ÚNICA (ESTO EVITA QUE SE JUNTEN DOS CANCIONES)
 if st.session_state.playlist.actual:
-    st.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo, loop=st.session_state.modo_repetir)
+    # Creamos un ID único usando el nombre de la canción. Si cambias de canción, se borra el audio viejo.
+    llave_audio = f"audio_{st.session_state.playlist.actual.cancion.nombre}"
+    
+    try:
+        st.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo, loop=st.session_state.modo_repetir, key=llave_audio)
+    except:
+        # Por si falla el loop en versiones anteriores de Streamlit
+        st.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo, key=llave_audio)
