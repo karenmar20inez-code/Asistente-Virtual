@@ -128,10 +128,10 @@ st.markdown(f"""
     .subtitulo-bonito {{
         color: {text_color};
         text-align: center;
-        font-size: 2.5rem; /* Noticeably larger subtitle */
+        font-size: 2.5rem; 
         font-weight: 300;
         letter-spacing: 6px;
-        margin-bottom: -15px; /* Adjust spacing to pull titulo closer */
+        margin-bottom: -15px; 
         text-transform: uppercase;
         opacity: 0.9;
         text-shadow: 0px 0px 10px {color_tema}88;
@@ -139,7 +139,7 @@ st.markdown(f"""
     .titulo {{ 
         color: {color_tema}; 
         text-align: center; 
-        font-size: 2rem; /* Noticeably smaller assistant name */
+        font-size: 2rem; 
         font-weight: 900; 
         letter-spacing: 4px; 
         margin-bottom: 2rem; 
@@ -152,26 +152,21 @@ st.markdown(f"""
     div.stButton > button {{ background-color: transparent !important; color: {text_color} !important; border-radius: 10px !important; border: 2px solid {color_tema} !important; font-weight: bold !important; width: 100% !important; }}
     div.stButton > button:hover {{ background-color: {color_tema} !important; color: #000 !important; box-shadow: 0 0 10px {color_tema} !important; }}
     
+    div.stLinkButton > a {{ background-color: {color_tema} !important; color: {'#000' if modo_oscuro else '#fff'} !important; border-radius: 10px !important; font-weight: 900 !important; width: 100% !important; display: flex; align-items: center; justify-content: center; text-decoration: none; padding: 10px;}}
+
     @media screen and (max-width: 768px) {{
         div[data-testid="stHorizontalBlock"] {{ display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 8px !important; justify-content: center !important; }}
         div[data-testid="column"] {{ flex: 0 0 30% !important; min-width: 30% !important; max-width: 32% !important; padding: 0 !important; }}
         div.stButton > button {{ font-size: 10px !important; height: 40px !important; min-height: 40px !important; padding: 0 2px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }}
         .subtitulo-bonito {{ font-size: 1.5rem; letter-spacing: 4px; margin-bottom: -10px; }}
         .titulo {{ font-size: 1.2rem; letter-spacing: 2px; }}
+        .buscador-grid div[data-testid="column"] {{ flex: 0 0 48% !important; min-width: 48% !important; max-width: 48% !important; }}
     }}
 
-    .footer {{
-        margin-top: 50px;
-        padding: 20px;
-        text-align: center;
-        border-top: 1px solid {color_tema}33;
-        font-size: 0.9rem;
-        color: {text_color}88;
-    }}
+    .footer {{ margin-top: 50px; padding: 20px; text-align: center; border-top: 1px solid {color_tema}33; font-size: 0.9rem; color: {text_color}88; }}
     </style>
     """, unsafe_allow_html=True)
 
-# Título centrado y bonito
 st.markdown("<p class='subtitulo-bonito'>Asistente Virtual Dual</p>", unsafe_allow_html=True)
 st.markdown(f"<h1 class='titulo'>{'✨ NEXY DIAMOND' if es_nexy else '🤖 CYBERX'}</h1>", unsafe_allow_html=True)
 
@@ -232,7 +227,40 @@ if col6.button("🗑️ Borrar"):
 
 st.markdown(f"<div class='consola'>{st.session_state.mensaje}</div>", unsafe_allow_html=True)
 
-# --- REPRODUCTOR DE VOZ BLINDADO (GÉNERO ESTRICTO) ---
+
+# ==========================================
+# --- 7. BUSCADOR (EXPLORADOR DE LA RED) ---
+# ==========================================
+st.markdown(f"<h3 style='text-align:center; color:{color_tema};'>🔍 Explorador de la Red</h3>", unsafe_allow_html=True)
+motor = st.radio("Motor de Búsqueda:", ["Google", "YouTube", "Wikipedia"], horizontal=True)
+
+st.markdown('<div class="buscador-grid">', unsafe_allow_html=True)
+c_in, c_bt = st.columns([2, 1])
+with c_in:
+    busqueda = st.text_input("Buscando...", placeholder="¿Qué quieres investigar?", label_visibility="collapsed")
+with c_bt:
+    if busqueda:
+        if motor == "Wikipedia":
+            if st.button("📖 WIKI", use_container_width=True):
+                try:
+                    wiki = wikipediaapi.Wikipedia(user_agent="BotDual/1.0", language='es')
+                    p = wiki.page(busqueda)
+                    if p.exists():
+                        res = p.summary[:250]
+                        set_mensaje(f"Extracción completada. Resumen: {res}...", f"O sea, encontré esto súper rápido: {res}...")
+                    else:
+                        set_mensaje("Sin resultados en base de datos.", "Wikipedia no sabe de eso, gordi.")
+                except: 
+                    set_mensaje("Error de conexión con la enciclopedia.", "Wiki fuera de línea.")
+        else:
+            url = f"https://www.google.com/search?q={busqueda.replace(' ', '+')}" if motor == "Google" else f"https://www.youtube.com/results?search_query={busqueda.replace(' ', '+')}"
+            st.link_button(f"🚀 {motor.upper()}", url, use_container_width=True)
+    else:
+        st.button("BUSCAR", disabled=True, use_container_width=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+
+# --- REPRODUCTOR DE VOZ (JS) ---
 if st.session_state.hablar_texto:
     texto = st.session_state.hablar_texto.replace('"', '').replace("'", "")
     es_mujer_js = "true" if es_nexy else "false"
@@ -243,45 +271,27 @@ if st.session_state.hablar_texto:
             var msg = new SpeechSynthesisUtterance("{texto}");
             var voices = window.speechSynthesis.getVoices();
             var esMujer = {es_mujer_js};
-            
             var spanV = voices.filter(v => v.lang.startsWith('es'));
             var vEle = null;
-
-            if (esMujer) {{
-                // Nombres precisos de mujer en Apple, Android y Windows
-                vEle = spanV.find(v => /paulina|monica|helena|sabina|lucia|dalia|margarita|mujer|female/i.test(v.name));
-            }} else {{
-                // Nombres precisos de hombre
-                vEle = spanV.find(v => /jorge|diego|juan|raul|pablo|carlos|hombre|male/i.test(v.name));
-            }}
-
-            if (vEle) {{
-                msg.voice = vEle;
-                msg.pitch = 1.0;
-            }} else if (spanV.length > 0) {{
-                // Si no hay nombres, usamos la fuerza bruta cambiando el tono de la voz base
-                msg.voice = spanV[0];
-                msg.pitch = esMujer ? 1.6 : 0.4; 
-            }} else {{
-                msg.lang = 'es-MX';
-                msg.pitch = esMujer ? 1.6 : 0.4;
-            }}
-
+            if (esMujer) {{ vEle = spanV.find(v => /paulina|monica|helena|sabina|lucia|dalia|margarita|mujer|female/i.test(v.name)); }}
+            else {{ vEle = spanV.find(v => /jorge|diego|juan|raul|pablo|carlos|hombre|male/i.test(v.name)); }}
+            if (vEle) {{ msg.voice = vEle; msg.pitch = 1.0; }}
+            else if (spanV.length > 0) {{ msg.voice = spanV[0]; msg.pitch = esMujer ? 1.6 : 0.4; }}
+            else {{ msg.lang = 'es-MX'; msg.pitch = esMujer ? 1.6 : 0.4; }}
             msg.rate = 1.0;
             window.speechSynthesis.speak(msg);
         }}
-
-        // Truco de carga asíncrona para que no falle en iOS
-        if (window.speechSynthesis.getVoices().length === 0) {{
-            window.speechSynthesis.onvoiceschanged = reproducir;
-        }} else {{
-            reproducir();
-        }}
+        if (window.speechSynthesis.getVoices().length === 0) {{ window.speechSynthesis.onvoiceschanged = reproducir; }}
+        else {{ reproducir(); }}
     </script>
     """, height=0)
     st.session_state.hablar_texto = ""
 
-# --- 7. REPRODUCTOR MUSICAL ---
+
+# ==========================================
+# --- 8. REPRODUCTOR MUSICAL ---
+# ==========================================
+st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown(f"<h3 style='text-align:center; color:{color_tema};'>📻 Reproductor Musical</h3>", unsafe_allow_html=True)
 
 if st.session_state.playlist.actual:
@@ -289,7 +299,6 @@ if st.session_state.playlist.actual:
 
 col_sh, col_an, col_pl, col_si, col_re = st.columns(5)
 
-# --- BOTONES DINÁMICOS ON/OFF ---
 lbl_sh = "🔀 Aleatorio ON" if st.session_state.modo_aleatorio else "🔀 Aleatorio OFF"
 if col_sh.button(lbl_sh):
     st.session_state.modo_aleatorio = not st.session_state.modo_aleatorio
@@ -348,7 +357,9 @@ if st.session_state.playlist.actual:
     except:
         contenedor_audio.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo)
 
-# --- 8. PIE DE PÁGINA ---
+# ==========================================
+# --- 9. PIE DE PÁGINA ---
+# ==========================================
 st.markdown(f"""
     <div class="footer">
         © 2026 Nexus Dynamics Corp. Todos los derechos reservados.<br>
