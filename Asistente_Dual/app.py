@@ -173,7 +173,7 @@ if col2.button("📅 Fecha"):
     dia_nexy = dias_nexy[dia.weekday()]
     
     set_mensaje(
-        f"Hoy es {dia_cyberx}, {dia.day} de {meses[dia.month-1]}. Registrado en la base de datos.", 
+        f"Hoy es {dia_cyberx}, {dia.day} de {meses[dia.month-1]}. Guardado en el log del sistema. Sobrevivimos un ciclo más en la Matrix 🕶️.", 
         f"Hoy es {dia_nexy}, {dia.day} de {meses[dia.month-1]}, obvio."
     )
 
@@ -184,8 +184,8 @@ if col3.button("🌤️ Clima"):
         t, c = unquote(r.text.strip()).replace('+', '').split('|')
         num = t.replace('°C', '').strip()
         set_mensaje(
-            f"Sensores marcan {num}°C y está {c.lower()}. No se me vaya a sobrecalentar el sistema.", 
-            f"Hace {num}°C y está {c.lower()} en la ciudad, pésimo para el cabello."
+            f"Estamos en CDMX a {num}°C y está {c.lower()}. No se me vaya a sobrecalentar el procesador, jefe 🌡️.", 
+            f"Estamos en CDMX a {num}°C y está {c.lower()}, pésimo para el cabello 💅🌧️."
         )
     except:
         set_mensaje("Fallo de red en sensores climáticos.", "No tengo el clima ahora, gordi.")
