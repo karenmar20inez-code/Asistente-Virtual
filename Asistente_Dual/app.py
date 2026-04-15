@@ -194,7 +194,7 @@ if col6.button("🗑️ Borrar"):
 
 st.markdown(f"<div class='consola'>{st.session_state.mensaje}</div>", unsafe_allow_html=True)
 
-# --- REPRODUCTOR DE VOZ BLINDADO ---
+# --- REPRODUCTOR DE VOZ BLINDADO (CORREGIDO) ---
 if st.session_state.hablar_texto:
     texto = st.session_state.hablar_texto.replace('"', '').replace("'", "")
     es_mujer_js = "true" if es_nexy else "false"
@@ -202,16 +202,19 @@ if st.session_state.hablar_texto:
     <script>
         function reproducir() {{
             window.speechSynthesis.cancel();
-            var msg = new SynthesisUtterance("{texto}");
+            // AQUÍ ESTABA EL ERROR: Faltaba "Speech" antes de "SynthesisUtterance"
+            var msg = new SpeechSynthesisUtterance("{texto}");
             var voices = window.speechSynthesis.getVoices();
             var esMujer = {es_mujer_js};
             var spanV = voices.filter(v => v.lang.startsWith('es'));
             var vEle = null;
             if (esMujer) {{ vEle = spanV.find(v => /paulina|monica|helena|sabina|lucia|dalia|margarita|mujer|female/i.test(v.name)); }}
             else {{ vEle = spanV.find(v => /jorge|diego|juan|raul|pablo|carlos|hombre|male/i.test(v.name)); }}
+            
             if (vEle) {{ msg.voice = vEle; msg.pitch = 1.0; }}
             else if (spanV.length > 0) {{ msg.voice = spanV[0]; msg.pitch = esMujer ? 1.6 : 0.4; }}
             else {{ msg.lang = 'es-MX'; msg.pitch = esMujer ? 1.6 : 0.4; }}
+            
             msg.rate = 1.0;
             window.speechSynthesis.speak(msg);
         }}
@@ -231,6 +234,8 @@ col_sh, col_an, col_pl, col_si, col_re = st.columns(5)
 
 if col_sh.button("🔀 Aleatorio"):
     st.session_state.modo_aleatorio = not st.session_state.modo_aleatorio
+    estado = "activado" if st.session_state.modo_aleatorio else "desactivado"
+    st.session_state.hablar_texto = f"Modo aleatorio {estado}." if es_nexy else f"Algoritmo aleatorio {estado}, jefe."
     st.rerun()
 
 if col_an.button("⏮️ Anterior"):
@@ -242,11 +247,16 @@ if col_an.button("⏮️ Anterior"):
     elif st.session_state.playlist.actual and st.session_state.playlist.actual.anterior:
         st.session_state.playlist.actual = st.session_state.playlist.actual.anterior
     st.session_state.reproduciendo = True
+    st.session_state.hablar_texto = "Regresando, gordi." if es_nexy else "Cargando pista anterior, jefe."
     st.rerun()
 
 lbl_p = "⏸️ Pausar" if st.session_state.reproduciendo else "▶️ Tocar"
 if col_pl.button(lbl_p):
     st.session_state.reproduciendo = not st.session_state.reproduciendo
+    if st.session_state.reproduciendo:
+        st.session_state.hablar_texto = "Música VIP en proceso." if es_nexy else "Dándole play al sistema."
+    else:
+        st.session_state.hablar_texto = "Música pausada." if es_nexy else "Audio muteado. Ahorrando RAM."
     st.rerun()
 
 if col_si.button("⏭️ Siguiente"):
@@ -262,10 +272,13 @@ if col_si.button("⏭️ Siguiente"):
     elif st.session_state.playlist.actual and st.session_state.playlist.actual.siguiente:
         st.session_state.playlist.actual = st.session_state.playlist.actual.siguiente
     st.session_state.reproduciendo = True
+    st.session_state.hablar_texto = "Siguiente hit." if es_nexy else "Saltando a la que sigue, jefe."
     st.rerun()
 
 if col_re.button("🔁 Repetir"):
     st.session_state.modo_repetir = not st.session_state.modo_repetir
+    estado = "activada" if st.session_state.modo_repetir else "desactivada"
+    st.session_state.hablar_texto = f"Repetición {estado}." if es_nexy else f"Loop infinito {estado}."
     st.rerun()
 
 if st.session_state.playlist.actual:
