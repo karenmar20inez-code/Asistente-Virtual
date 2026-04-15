@@ -70,16 +70,16 @@ if 'modo_aleatorio' not in st.session_state:
 if 'modo_repetir' not in st.session_state:
     st.session_state.modo_repetir = False
 
-# --- FUNCIONES DE VOZ Y ASISTENTE (PERSONALIDAD CYBERX/NEXY) ---
+# --- FUNCIONES DE VOZ Y ASISTENTE ---
 def guardar_nombre():
     if st.session_state.widget_nombre:
         st.session_state.nombre_usuario = st.session_state.widget_nombre.title()
         st.session_state.widget_nombre = "" 
         nombre = st.session_state.nombre_usuario
         if "Nexy" in st.session_state.radio_asistente:
-            msg = f"¡Obvio te iba a saludar, {nombre}! Bienvenida a la Central Diamond. Pídeme lo que quieras, gordi."
+            msg = f"¡Obvio te iba a saludar, {nombre}! Bienvenida a la Central Diamond 💅✨. Pídeme lo que quieras."
         else:
-            msg = f"¡Qué rollo, {nombre}! Cyberx en línea. Los servidores están al 100 y listos para el jale, jefe."
+            msg = f"¡Qué rollo, {nombre}! Cyberx en línea. Los servidores están al 100 y listos para el jale, jefe 🤖💻."
         st.session_state.mensaje = msg
         st.session_state.hablar_texto = msg
 
@@ -135,6 +135,15 @@ st.markdown(f"""
         div[data-testid="column"] {{ flex: 0 0 30% !important; min-width: 30% !important; max-width: 32% !important; padding: 0 !important; }}
         div.stButton > button {{ font-size: 10px !important; height: 40px !important; min-height: 40px !important; padding: 0 2px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }}
     }}
+
+    .footer {{
+        margin-top: 50px;
+        padding: 20px;
+        text-align: center;
+        border-top: 1px solid {color_tema}33;
+        font-size: 0.9rem;
+        color: {text_color}88;
+    }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -185,7 +194,7 @@ if col6.button("🗑️ Borrar"):
 
 st.markdown(f"<div class='consola'>{st.session_state.mensaje}</div>", unsafe_allow_html=True)
 
-# --- REPRODUCTOR DE VOZ BLINDADO (GÉNERO ESTRICTO) ---
+# --- REPRODUCTOR DE VOZ BLINDADO ---
 if st.session_state.hablar_texto:
     texto = st.session_state.hablar_texto.replace('"', '').replace("'", "")
     es_mujer_js = "true" if es_nexy else "false"
@@ -193,50 +202,26 @@ if st.session_state.hablar_texto:
     <script>
         function reproducir() {{
             window.speechSynthesis.cancel();
-            var msg = new SpeechSynthesisUtterance("{texto}");
+            var msg = new SynthesisUtterance("{texto}");
             var voices = window.speechSynthesis.getVoices();
             var esMujer = {es_mujer_js};
-            
             var spanV = voices.filter(v => v.lang.startsWith('es'));
             var vEle = null;
-
-            if (esMujer) {{
-                // Nombres precisos de mujer en Apple, Android y Windows
-                vEle = spanV.find(v => /paulina|monica|helena|sabina|lucia|dalia|margarita|mujer|female/i.test(v.name));
-            }} else {{
-                // Nombres precisos de hombre
-                vEle = spanV.find(v => /jorge|diego|juan|raul|pablo|carlos|hombre|male/i.test(v.name));
-            }}
-
-            if (vEle) {{
-                msg.voice = vEle;
-                msg.pitch = 1.0;
-            }} else if (spanV.length > 0) {{
-                // Si no hay nombres, usamos la fuerza bruta cambiando el tono de la voz base
-                msg.voice = spanV[0];
-                msg.pitch = esMujer ? 1.6 : 0.4; 
-            }} else {{
-                msg.lang = 'es-MX';
-                msg.pitch = esMujer ? 1.6 : 0.4;
-            }}
-
+            if (esMujer) {{ vEle = spanV.find(v => /paulina|monica|helena|sabina|lucia|dalia|margarita|mujer|female/i.test(v.name)); }}
+            else {{ vEle = spanV.find(v => /jorge|diego|juan|raul|pablo|carlos|hombre|male/i.test(v.name)); }}
+            if (vEle) {{ msg.voice = vEle; msg.pitch = 1.0; }}
+            else if (spanV.length > 0) {{ msg.voice = spanV[0]; msg.pitch = esMujer ? 1.6 : 0.4; }}
+            else {{ msg.lang = 'es-MX'; msg.pitch = esMujer ? 1.6 : 0.4; }}
             msg.rate = 1.0;
             window.speechSynthesis.speak(msg);
         }}
-
-        // Truco de carga asíncrona para que no falle en iOS
-        if (window.speechSynthesis.getVoices().length === 0) {{
-            window.speechSynthesis.onvoiceschanged = reproducir;
-        }} else {{
-            reproducir();
-        }}
+        if (window.speechSynthesis.getVoices().length === 0) {{ window.speechSynthesis.onvoiceschanged = reproducir; }}
+        else {{ reproducir(); }}
     </script>
     """, height=0)
     st.session_state.hablar_texto = ""
 
-# ==========================================
-# --- 7. REPRODUCTOR MUSICAL CORREGIDO ---
-# ==========================================
+# --- 7. REPRODUCTOR MUSICAL ---
 st.markdown(f"<h3 style='text-align:center; color:{color_tema};'>📻 Reproductor Musical</h3>", unsafe_allow_html=True)
 
 if st.session_state.playlist.actual:
@@ -244,15 +229,10 @@ if st.session_state.playlist.actual:
 
 col_sh, col_an, col_pl, col_si, col_re = st.columns(5)
 
-# 1. ALEATORIO
-lbl_sh = "🔀 Aleat. ON" if st.session_state.modo_aleatorio else "🔀 Aleat. OFF"
-if col_sh.button(lbl_sh):
+if col_sh.button("🔀 Aleatorio"):
     st.session_state.modo_aleatorio = not st.session_state.modo_aleatorio
-    estado = "activado" if st.session_state.modo_aleatorio else "desactivado"
-    st.session_state.hablar_texto = f"Modo aleatorio {estado}." if es_nexy else f"Algoritmo aleatorio {estado}, jefe."
     st.rerun()
 
-# 2. ANTERIOR
 if col_an.button("⏮️ Anterior"):
     if st.session_state.modo_aleatorio:
         nodos = []
@@ -262,20 +242,13 @@ if col_an.button("⏮️ Anterior"):
     elif st.session_state.playlist.actual and st.session_state.playlist.actual.anterior:
         st.session_state.playlist.actual = st.session_state.playlist.actual.anterior
     st.session_state.reproduciendo = True
-    st.session_state.hablar_texto = "Regresando, gordi." if es_nexy else "Cargando pista anterior, jefe."
     st.rerun()
 
-# 3. PLAY / PAUSE
 lbl_p = "⏸️ Pausar" if st.session_state.reproduciendo else "▶️ Tocar"
 if col_pl.button(lbl_p):
     st.session_state.reproduciendo = not st.session_state.reproduciendo
-    if st.session_state.reproduciendo:
-        st.session_state.hablar_texto = "Música VIP en proceso." if es_nexy else "Dándole play al sistema."
-    else:
-        st.session_state.hablar_texto = "Música pausada." if es_nexy else "Audio muteado. Ahorrando RAM."
     st.rerun()
 
-# 4. SIGUIENTE
 if col_si.button("⏭️ Siguiente"):
     if st.session_state.modo_aleatorio:
         nodos = []
@@ -283,29 +256,29 @@ if col_si.button("⏭️ Siguiente"):
         while t: nodos.append(t); t = t.siguiente
         if nodos:
             nuevo = random.choice(nodos)
-            intentos = 0
-            while len(nodos) > 1 and nuevo == st.session_state.playlist.actual and intentos < 5:
+            while len(nodos) > 1 and nuevo == st.session_state.playlist.actual:
                 nuevo = random.choice(nodos)
-                intentos += 1
             st.session_state.playlist.actual = nuevo
     elif st.session_state.playlist.actual and st.session_state.playlist.actual.siguiente:
         st.session_state.playlist.actual = st.session_state.playlist.actual.siguiente
     st.session_state.reproduciendo = True
-    st.session_state.hablar_texto = "Siguiente hit." if es_nexy else "Saltando a la que sigue, jefe."
     st.rerun()
 
-# 5. REPETIR 
-lbl_r = "🔁 Repetir ON" if st.session_state.modo_repetir else "🔁 Repet. OFF"
-if col_re.button(lbl_r):
+if col_re.button("🔁 Repetir"):
     st.session_state.modo_repetir = not st.session_state.modo_repetir
-    estado = "activada" if st.session_state.modo_repetir else "desactivada"
-    st.session_state.hablar_texto = f"Repetición {estado}." if es_nexy else f"Loop infinito {estado}."
     st.rerun()
 
-# AUDIO CON ST.EMPTY PARA QUE NO SE EMPALMEN
 if st.session_state.playlist.actual:
     contenedor_audio = st.empty()
     try:
         contenedor_audio.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo, loop=st.session_state.modo_repetir)
     except:
         contenedor_audio.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo)
+
+# --- 8. PIE DE PÁGINA (DERECHOS RESERVADOS) ---
+st.markdown(f"""
+    <div class="footer">
+        © 2026 Karen Lizette Correa Martínez. Todos los derechos reservados.<br>
+        📧 Contacto Técnico: <a href="mailto:soporte.especializado@ingenieros.system.premium" style="color:{color_tema}; text-decoration:none;">soporte.especializado@ingenieros.system.premium</a>
+    </div>
+""", unsafe_allow_html=True)
