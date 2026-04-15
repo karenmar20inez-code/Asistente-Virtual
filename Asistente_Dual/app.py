@@ -82,9 +82,9 @@ def guardar_nombre():
         
         nombre = st.session_state.nombre_usuario
         if "Nexy" in st.session_state.radio_asistente:
-            msg = f"O sea, ¡obvio te iba a saludar, {nombre}! Bienvenida a la Central Diamond 💅✨💎. Pídeme lo que quieras."
+            msg = f"O sea, ¡obvio te iba a saludar, {nombre}! Bienvenida a la Central Diamond. Pídeme lo que quieras."
         else:
-            msg = f"¡Qué rollo, {nombre}! Bienvenido a la Central de Mando de Elpidio 🤠🚜🛠️. A la orden, patrón."
+            msg = f"¡Qué rollo, {nombre}! Bienvenido a la Central de Mando de Elpidio. A la orden, patrón."
             
         st.session_state.mensaje = msg
         st.session_state.hablar_texto = msg
@@ -176,27 +176,28 @@ st.markdown(f"""
     hr {{ border-top: 1px solid {color_tema}55; margin: 2rem 0; }}
 
     /* =========================================================
-       MAGIA RESPONSIVA PARA CELULARES (GRID 3x2 PERFECTO)
+       MAGIA RESPONSIVA MEJORADA (REPARACIÓN DE GRID EN iOS)
        ========================================================= */
-    @media (max-width: 768px) {{
+    @media screen and (max-width: 768px) {{
+        /* Anulamos el comportamiento por defecto de Streamlit y forzamos el wrap */
         div[data-testid="stHorizontalBlock"] {{
             flex-direction: row !important;
             flex-wrap: wrap !important;
-            justify-content: center !important;
+            gap: 2% !important; /* Gap dinámico estricto */
         }}
+        /* Permitimos que cada botón crezca uniformemente partiendo de un 30% base */
         div[data-testid="column"] {{
             width: auto !important;
-            min-width: 30% !important; /* Fuerza a que quepan exactamente 3 por línea */
-            flex: 1 1 30% !important;
-            padding: 3px !important; /* Espacio pequeñito entre botones */
+            flex: 1 1 30% !important; 
+            min-width: 30% !important;
+            padding: 0 !important;
         }}
+        /* Reducimos la letra ligeramente para evitar que el texto se salga de la pantalla */
         div.stButton > button {{
-            font-size: 0.75rem !important; /* Letra ajustada para pantallas pequeñas */
-            padding: 2px !important;
-            height: 45px !important;
-            white-space: nowrap !important; /* Evita que el texto se rompa feo */
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
+            font-size: 0.75rem !important; 
+            padding: 2px 5px !important;
+            height: auto !important;
+            min-height: 45px !important;
         }}
     }}
     /* ========================================================= */
