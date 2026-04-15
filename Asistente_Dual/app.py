@@ -124,18 +124,28 @@ st.markdown(f"""
     [data-testid="stAlert"] {{ background-color: {card_bg} !important; color: {text_color} !important; border: 1px solid {color_tema} !important; }}
     .stTextInput input {{ background-color: {card_bg} !important; color: {text_color} !important; border: 1px solid {color_tema}55 !important; }}
     
-    /* Títulos Bonitos */
+    /* Títulos Bonitos y Ajuste de Tamaño */
     .subtitulo-bonito {{
         color: {text_color};
         text-align: center;
-        font-size: 0.85rem;
+        font-size: 2.5rem; /* Noticeably larger subtitle */
         font-weight: 300;
         letter-spacing: 6px;
-        margin-bottom: -10px;
+        margin-bottom: -15px; /* Adjust spacing to pull titulo closer */
         text-transform: uppercase;
-        opacity: 0.8;
+        opacity: 0.9;
+        text-shadow: 0px 0px 10px {color_tema}88;
     }}
-    .titulo {{ color: {color_tema}; text-align: center; font-weight: 900; letter-spacing: 4px; margin-bottom: 2rem; text-transform: uppercase; text-shadow: 0px 0px 15px {color_tema}; }}
+    .titulo {{ 
+        color: {color_tema}; 
+        text-align: center; 
+        font-size: 2rem; /* Noticeably smaller assistant name */
+        font-weight: 900; 
+        letter-spacing: 4px; 
+        margin-bottom: 2rem; 
+        text-transform: uppercase; 
+        text-shadow: 0px 0px 15px {color_tema}; 
+    }}
     
     .consola {{ padding: 20px; background: {card_bg}; border: 2px solid {color_tema}; border-radius: 12px; color: {text_color}; font-size: 1.1rem; text-align: center; margin-bottom: 2rem; box-shadow: 0 0 15px {color_resplandor}; }}
     
@@ -146,6 +156,8 @@ st.markdown(f"""
         div[data-testid="stHorizontalBlock"] {{ display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 8px !important; justify-content: center !important; }}
         div[data-testid="column"] {{ flex: 0 0 30% !important; min-width: 30% !important; max-width: 32% !important; padding: 0 !important; }}
         div.stButton > button {{ font-size: 10px !important; height: 40px !important; min-height: 40px !important; padding: 0 2px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }}
+        .subtitulo-bonito {{ font-size: 1.5rem; letter-spacing: 4px; margin-bottom: -10px; }}
+        .titulo {{ font-size: 1.2rem; letter-spacing: 2px; }}
     }}
 
     .footer {{
@@ -160,7 +172,7 @@ st.markdown(f"""
     """, unsafe_allow_html=True)
 
 # Título centrado y bonito
-st.markdown("<p class='subtitulo-bonito'>Asistente Virtual</p>", unsafe_allow_html=True)
+st.markdown("<p class='subtitulo-bonito'>Asistente Virtual Dual</p>", unsafe_allow_html=True)
 st.markdown(f"<h1 class='titulo'>{'✨ NEXY DIAMOND' if es_nexy else '🤖 CYBERX'}</h1>", unsafe_allow_html=True)
 
 # --- 6. PANEL DE CONTROL ---
@@ -220,7 +232,7 @@ if col6.button("🗑️ Borrar"):
 
 st.markdown(f"<div class='consola'>{st.session_state.mensaje}</div>", unsafe_allow_html=True)
 
-# --- REPRODUCTOR DE VOZ ---
+# --- REPRODUCTOR DE VOZ BLINDADO (GÉNERO ESTRICTO) ---
 if st.session_state.hablar_texto:
     texto = st.session_state.hablar_texto.replace('"', '').replace("'", "")
     es_mujer_js = "true" if es_nexy else "false"
@@ -231,18 +243,40 @@ if st.session_state.hablar_texto:
             var msg = new SpeechSynthesisUtterance("{texto}");
             var voices = window.speechSynthesis.getVoices();
             var esMujer = {es_mujer_js};
+            
             var spanV = voices.filter(v => v.lang.startsWith('es'));
             var vEle = null;
-            if (esMujer) {{ vEle = spanV.find(v => /paulina|monica|helena|sabina|lucia|dalia|margarita|mujer|female/i.test(v.name)); }}
-            else {{ vEle = spanV.find(v => /jorge|diego|juan|raul|pablo|carlos|hombre|male/i.test(v.name)); }}
-            if (vEle) {{ msg.voice = vEle; msg.pitch = 1.0; }}
-            else if (spanV.length > 0) {{ msg.voice = spanV[0]; msg.pitch = esMujer ? 1.6 : 0.4; }}
-            else {{ msg.lang = 'es-MX'; msg.pitch = esMujer ? 1.6 : 0.4; }}
+
+            if (esMujer) {{
+                // Nombres precisos de mujer en Apple, Android y Windows
+                vEle = spanV.find(v => /paulina|monica|helena|sabina|lucia|dalia|margarita|mujer|female/i.test(v.name));
+            }} else {{
+                // Nombres precisos de hombre
+                vEle = spanV.find(v => /jorge|diego|juan|raul|pablo|carlos|hombre|male/i.test(v.name));
+            }}
+
+            if (vEle) {{
+                msg.voice = vEle;
+                msg.pitch = 1.0;
+            }} else if (spanV.length > 0) {{
+                // Si no hay nombres, usamos la fuerza bruta cambiando el tono de la voz base
+                msg.voice = spanV[0];
+                msg.pitch = esMujer ? 1.6 : 0.4; 
+            }} else {{
+                msg.lang = 'es-MX';
+                msg.pitch = esMujer ? 1.6 : 0.4;
+            }}
+
             msg.rate = 1.0;
             window.speechSynthesis.speak(msg);
         }}
-        if (window.speechSynthesis.getVoices().length === 0) {{ window.speechSynthesis.onvoiceschanged = reproducir; }}
-        else {{ reproducir(); }}
+
+        // Truco de carga asíncrona para que no falle en iOS
+        if (window.speechSynthesis.getVoices().length === 0) {{
+            window.speechSynthesis.onvoiceschanged = reproducir;
+        }} else {{
+            reproducir();
+        }}
     </script>
     """, height=0)
     st.session_state.hablar_texto = ""
@@ -255,6 +289,7 @@ if st.session_state.playlist.actual:
 
 col_sh, col_an, col_pl, col_si, col_re = st.columns(5)
 
+# --- BOTONES DINÁMICOS ON/OFF ---
 lbl_sh = "🔀 Aleatorio ON" if st.session_state.modo_aleatorio else "🔀 Aleatorio OFF"
 if col_sh.button(lbl_sh):
     st.session_state.modo_aleatorio = not st.session_state.modo_aleatorio
@@ -271,11 +306,16 @@ if col_an.button("⏮️ Anterior"):
     elif st.session_state.playlist.actual and st.session_state.playlist.actual.anterior:
         st.session_state.playlist.actual = st.session_state.playlist.actual.anterior
     st.session_state.reproduciendo = True
+    st.session_state.hablar_texto = "Regresando, gordi." if es_nexy else "Cargando pista anterior, jefe."
     st.rerun()
 
 lbl_p = "⏸️ Pausar" if st.session_state.reproduciendo else "▶️ Tocar"
 if col_pl.button(lbl_p):
     st.session_state.reproduciendo = not st.session_state.reproduciendo
+    if st.session_state.reproduciendo:
+        st.session_state.hablar_texto = "Música VIP en proceso." if es_nexy else "Dándole play al sistema."
+    else:
+        st.session_state.hablar_texto = "Música pausada." if es_nexy else "Audio muteado. Ahorrando RAM."
     st.rerun()
 
 if col_si.button("⏭️ Siguiente"):
@@ -291,11 +331,14 @@ if col_si.button("⏭️ Siguiente"):
     elif st.session_state.playlist.actual and st.session_state.playlist.actual.siguiente:
         st.session_state.playlist.actual = st.session_state.playlist.actual.siguiente
     st.session_state.reproduciendo = True
+    st.session_state.hablar_texto = "Siguiente hit." if es_nexy else "Saltando a la que sigue, jefe."
     st.rerun()
 
 lbl_r = "🔁 Repetir ON" if st.session_state.modo_repetir else "🔁 Repetir OFF"
 if col_re.button(lbl_r):
     st.session_state.modo_repetir = not st.session_state.modo_repetir
+    estado = "activada" if st.session_state.modo_repetir else "desactivada"
+    st.session_state.hablar_texto = f"Repetición {estado}." if es_nexy else f"Loop infinito {estado}."
     st.rerun()
 
 if st.session_state.playlist.actual:
