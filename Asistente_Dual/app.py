@@ -149,7 +149,7 @@ st.markdown(f"""
 
 st.markdown(f"<h1 class='titulo'>{'✨ NEXY DIAMOND' if es_nexy else '🤖 CYBERX'}</h1>", unsafe_allow_html=True)
 
-# --- 6. PANEL DE CONTROL (AUTO-PAUSA) ---
+# --- 6. PANEL DE CONTROL ---
 def set_mensaje(msg_cyberx, msg_nexy):
     st.session_state.reproduciendo = False 
     respuesta = msg_nexy if es_nexy else msg_cyberx
@@ -164,9 +164,18 @@ if col1.button("⌚ Hora"):
     set_mensaje(f"Son las {ahora}. El reloj del CPU va que vuela, jefe.", f"Son las {ahora}, gordi. El tiempo vuela.")
 
 if col2.button("📅 Fecha"):
-    dia = datetime.date.today()
+    dia = datetime.datetime.now(zona_horaria)
+    dias_cyberx = ["Lunes", "Martes", "Miercoles", "Juevebes", "Beviernes", "Sabadrink", "Domingo"]
+    dias_nexy = ["Lunes", "Martes", "Mimiercoles", "Jueves", "Viernesuky", "Sadabuky", "Dominguirrris"]
     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
-    set_mensaje(f"Hoy es {dia.day} de {meses[dia.month-1]}. Registrado en la base de datos.", f"Hoy es {dia.day} de {meses[dia.month-1]}, obvio.")
+    
+    dia_cyberx = dias_cyberx[dia.weekday()]
+    dia_nexy = dias_nexy[dia.weekday()]
+    
+    set_mensaje(
+        f"Hoy es {dia_cyberx}, {dia.day} de {meses[dia.month-1]}. Registrado en la base de datos.", 
+        f"Hoy es {dia_nexy}, {dia.day} de {meses[dia.month-1]}, obvio."
+    )
 
 if col3.button("🌤️ Clima"):
     try:
@@ -174,7 +183,10 @@ if col3.button("🌤️ Clima"):
         r.encoding = 'utf-8' 
         t, c = unquote(r.text.strip()).replace('+', '').split('|')
         num = t.replace('°C', '').strip()
-        set_mensaje(f"Sensores marcan {num} grados y está {c.lower()}. No se me vaya a sobrecalentar el sistema.", f"Hace {num} grados centígrados y está {c.lower()} en la ciudad.")
+        set_mensaje(
+            f"Sensores marcan {num}°C y está {c.lower()}. No se me vaya a sobrecalentar el sistema.", 
+            f"Hace {num}°C y está {c.lower()} en la ciudad, pésimo para el cabello."
+        )
     except:
         set_mensaje("Fallo de red en sensores climáticos.", "No tengo el clima ahora, gordi.")
 
@@ -194,7 +206,7 @@ if col6.button("🗑️ Borrar"):
 
 st.markdown(f"<div class='consola'>{st.session_state.mensaje}</div>", unsafe_allow_html=True)
 
-# --- REPRODUCTOR DE VOZ BLINDADO (CORREGIDO) ---
+# --- REPRODUCTOR DE VOZ ---
 if st.session_state.hablar_texto:
     texto = st.session_state.hablar_texto.replace('"', '').replace("'", "")
     es_mujer_js = "true" if es_nexy else "false"
@@ -202,7 +214,6 @@ if st.session_state.hablar_texto:
     <script>
         function reproducir() {{
             window.speechSynthesis.cancel();
-            // AQUÍ ESTABA EL ERROR: Faltaba "Speech" antes de "SynthesisUtterance"
             var msg = new SpeechSynthesisUtterance("{texto}");
             var voices = window.speechSynthesis.getVoices();
             var esMujer = {es_mujer_js};
@@ -210,11 +221,9 @@ if st.session_state.hablar_texto:
             var vEle = null;
             if (esMujer) {{ vEle = spanV.find(v => /paulina|monica|helena|sabina|lucia|dalia|margarita|mujer|female/i.test(v.name)); }}
             else {{ vEle = spanV.find(v => /jorge|diego|juan|raul|pablo|carlos|hombre|male/i.test(v.name)); }}
-            
             if (vEle) {{ msg.voice = vEle; msg.pitch = 1.0; }}
             else if (spanV.length > 0) {{ msg.voice = spanV[0]; msg.pitch = esMujer ? 1.6 : 0.4; }}
             else {{ msg.lang = 'es-MX'; msg.pitch = esMujer ? 1.6 : 0.4; }}
-            
             msg.rate = 1.0;
             window.speechSynthesis.speak(msg);
         }}
@@ -232,7 +241,9 @@ if st.session_state.playlist.actual:
 
 col_sh, col_an, col_pl, col_si, col_re = st.columns(5)
 
-if col_sh.button("🔀 Aleatorio"):
+# --- BOTONES DINÁMICOS ON/OFF ---
+lbl_sh = "🔀 Aleatorio ON" if st.session_state.modo_aleatorio else "🔀 Aleatorio OFF"
+if col_sh.button(lbl_sh):
     st.session_state.modo_aleatorio = not st.session_state.modo_aleatorio
     estado = "activado" if st.session_state.modo_aleatorio else "desactivado"
     st.session_state.hablar_texto = f"Modo aleatorio {estado}." if es_nexy else f"Algoritmo aleatorio {estado}, jefe."
@@ -275,7 +286,8 @@ if col_si.button("⏭️ Siguiente"):
     st.session_state.hablar_texto = "Siguiente hit." if es_nexy else "Saltando a la que sigue, jefe."
     st.rerun()
 
-if col_re.button("🔁 Repetir"):
+lbl_r = "🔁 Repetir ON" if st.session_state.modo_repetir else "🔁 Repetir OFF"
+if col_re.button(lbl_r):
     st.session_state.modo_repetir = not st.session_state.modo_repetir
     estado = "activada" if st.session_state.modo_repetir else "desactivada"
     st.session_state.hablar_texto = f"Repetición {estado}." if es_nexy else f"Loop infinito {estado}."
