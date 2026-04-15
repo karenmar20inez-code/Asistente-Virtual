@@ -1,33 +1,40 @@
-# 🤖 Central de Mando: Asistente Dual (Nexy Diamond & Elpidio)
+# 🚀 Asistente Virtual: Central de Mando (Nexy & Cyberx)
 
-¡Bienvenido a la **Central de Mando**! Esta es una aplicación web interactiva desarrollada con Python y Streamlit que funciona como un asistente virtual con doble personalidad. 
+![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.30+-red.svg)
+![Build](https://img.shields.io/badge/Estado-Producci%C3%B3n-success.svg)
 
-La aplicación permite al usuario interactuar con dos perfiles distintos, cada uno con su propio diseño, paleta de colores y voz generada dinámicamente:
-* 💅 **Nexy Diamond:** Un asistente elegante, moderno y con un toque "fresa" y sofisticado (Estilo Neón Rosa).
-* 🤠 **Elpidio:** Un asistente práctico, de campo y directo (Estilo Neón Cyan).
+Una aplicación web interactiva desarrollada en **Python** utilizando el framework **Streamlit**. Este sistema funciona como un panel de control personal y asistente virtual dual, optimizado con diseño responsivo avanzado (Mobile-First) para funcionar perfectamente en dispositivos iOS y Android.
+
+Desarrollado y mantenido bajo la licencia de **Nexus Dynamics Corp.**
 
 ## ✨ Características Principales
 
-* **Interfaz Dinámica (UI/UX):** Tema claro/oscuro personalizable y diseño minimalista tipo "Ghost Buttons" con animaciones CSS y efectos de resplandor neón.
-* **Síntesis de Voz Nativa (TTS):** Integración con la API de `speechSynthesis` de JavaScript para respuestas de voz instantáneas, detectando voces femeninas o masculinas según el asistente elegido.
-* **Reproductor Musical Integrado:** Sistema de listas ligadas en Python para reproducir música local, con controles de reproducción (Anterior, Pausa/Play, Siguiente) y modos Aleatorio/Repetir.
-* **Consultas en Tiempo Real:** * 🌤️ Clima actual (vía `wttr.in`).
-    * 💵 Tipo de cambio del Dólar (vía `yfinance`).
-    * 😂 Chistes aleatorios (vía `pyjokes`).
-    * 📅 Fecha y ⌚ Hora del sistema.
-* **Buscador Inteligente:** Permite hacer consultas rápidas que leen resúmenes de Wikipedia en voz alta, o redirigen con botones de acción seguros hacia Google y YouTube.
-* **Saludo Personalizado:** Memoria de sesión que recuerda tu nombre y te saluda de acuerdo a la personalidad del asistente activo.
+* **🤖 Asistente Dual (Personalidad Múltiple):** Interfaz intercambiable entre "Nexy Diamond" (estilo informal/sassy) y "Cyberx" (estilo tecnológico/hacker).
+* **🗣️ Síntesis de Voz Nativa (TTS):** Integración con la API `SpeechSynthesis` de JavaScript para respuestas de voz automáticas, con algoritmos de reconocimiento de género y ajuste dinámico de tono (Pitch) dependiendo del asistente seleccionado.
+* **📱 Diseño Responsivo Nivel Hardware:** CSS inyectado para forzar un Grid perfecto de 3x2 en dispositivos móviles, anulando los bloqueos de diseño nativos de motores como WebKit (Safari/iOS).
+* **📻 Reproductor Musical Inteligente:** * Construido utilizando una estructura de datos de **Listas Doblemente Ligadas** (`Clase Nodo` y `Clase Playlist`).
+  * Soporte para modos "Aleatorio" (Mix) y "Bucle" (Loop).
+  * Auto-pausa inteligente al interactuar con otras funciones del sistema.
+  * Solución de asincronía en la nube mediante `st.empty()` para evitar superposición de canales de audio.
+* **🛠️ Herramientas Integradas:**
+  * **Clima:** Conexión a la API de `wttr.in` para datos en tiempo real.
+  * **Finanzas:** Web scraping y consumo de la API de Yahoo Finance (`yfinance`) para el tipo de cambio USD/MXN.
+  * **Búsqueda Avanzada:** Motor de consulta directo a la API de `wikipedia-api` y redirección a Google/YouTube.
+  * **Utilidades:** Reloj con zona horaria estricta (`pytz`), calendario con arrays personalizados de días, y generador de chistes para programadores (`pyjokes`).
 
-## 🛠️ Tecnologías Utilizadas
+## 📁 Estructura del Proyecto
 
-* **Lenguaje:** Python 3
-* **Framework Frontend:** Streamlit
-* **Integración Web:** HTML, CSS y JavaScript nativo (Streamlit Components)
-* **Librerías principales:** `yfinance`, `wikipedia-api`, `pyjokes`, `requests`, `pytz`
+Para que el sistema funcione correctamente, se requiere la siguiente estructura de carpetas:
 
-## 🚀 Cómo ejecutar el proyecto localmente
-
-1. Clona este repositorio en tu computadora.
-2. Instala las dependencias necesarias ejecutando en tu terminal:
-   ```bash
-   pip install -r requirements.txt
+```text
+Asistente-Virtual/
+│
+├── Asistente_Dual/
+│   ├── app.py              # Código fuente principal de la Central de Mando
+│   └── Musica/             # ⚠️ Carpeta OBLIGATORIA para los archivos de audio
+│       ├── cancion1.mp3
+│       └── cancion2.wav
+│
+├── requirements.txt        # Dependencias del proyecto
+└── README.md               # Este archivo
