@@ -77,9 +77,9 @@ def guardar_nombre():
         st.session_state.widget_nombre = "" 
         nombre = st.session_state.nombre_usuario
         if "Nexy" in st.session_state.radio_asistente:
-            msg = f"¡Obvio te iba a saludar, {nombre}! Bienvenida a la Central Diamond 💅✨. Pídeme lo que quieras."
+            msg = f"¡Obvio te iba a saludar, {nombre}! Bienvenida a la Central Diamond. Pídeme lo que quieras, gordi."
         else:
-            msg = f"¡Qué rollo, {nombre}! Cyberx en línea. Los servidores están al 100 y listos para el jale, jefe 🤖💻."
+            msg = f"¡Qué rollo, {nombre}! Cyberx en línea. Los servidores están al 100 y listos para el jale, jefe."
         st.session_state.mensaje = msg
         st.session_state.hablar_texto = msg
 
@@ -185,43 +185,51 @@ if col6.button("🗑️ Borrar"):
 
 st.markdown(f"<div class='consola'>{st.session_state.mensaje}</div>", unsafe_allow_html=True)
 
-# --- REPRODUCTOR DE VOZ CON RECONOCIMIENTO DE GÉNERO Y TONO ---
+# --- REPRODUCTOR DE VOZ BLINDADO (GÉNERO ESTRICTO) ---
 if st.session_state.hablar_texto:
     texto = st.session_state.hablar_texto.replace('"', '').replace("'", "")
     es_mujer_js = "true" if es_nexy else "false"
     components.html(f"""
     <script>
-        window.speechSynthesis.cancel();
-        var msg = new SpeechSynthesisUtterance("{texto}");
-        var voices = window.speechSynthesis.getVoices();
-        var esMujer = {es_mujer_js};
-        
-        // Filtramos solo las voces en español
-        var spanV = voices.filter(v => v.lang.startsWith('es'));
-        var vEle = null;
+        function reproducir() {{
+            window.speechSynthesis.cancel();
+            var msg = new SpeechSynthesisUtterance("{texto}");
+            var voices = window.speechSynthesis.getVoices();
+            var esMujer = {es_mujer_js};
+            
+            var spanV = voices.filter(v => v.lang.startsWith('es'));
+            var vEle = null;
 
-        if (esMujer) {{
-            // Nombres de mujer comunes en iOS, Windows y Android
-            vEle = spanV.find(v => /monica|paulina|helena|sabina|dalia|margarita|lucia|mujer|female/i.test(v.name));
-        }} else {{
-            // Nombres de hombre comunes en iOS, Windows y Android
-            vEle = spanV.find(v => /jorge|diego|juan|raul|pablo|carlos|hombre|male/i.test(v.name));
+            if (esMujer) {{
+                // Nombres precisos de mujer en Apple, Android y Windows
+                vEle = spanV.find(v => /paulina|monica|helena|sabina|lucia|dalia|margarita|mujer|female/i.test(v.name));
+            }} else {{
+                // Nombres precisos de hombre
+                vEle = spanV.find(v => /jorge|diego|juan|raul|pablo|carlos|hombre|male/i.test(v.name));
+            }}
+
+            if (vEle) {{
+                msg.voice = vEle;
+                msg.pitch = 1.0;
+            }} else if (spanV.length > 0) {{
+                // Si no hay nombres, usamos la fuerza bruta cambiando el tono de la voz base
+                msg.voice = spanV[0];
+                msg.pitch = esMujer ? 1.6 : 0.4; 
+            }} else {{
+                msg.lang = 'es-MX';
+                msg.pitch = esMujer ? 1.6 : 0.4;
+            }}
+
+            msg.rate = 1.0;
+            window.speechSynthesis.speak(msg);
         }}
 
-        // Si encuentra la voz exacta, la asigna. Si no, usa el modificador de Tono (Pitch)
-        if (vEle) {{
-            msg.voice = vEle;
-            msg.pitch = 1.0;
-        }} else if (spanV.length > 0) {{
-            msg.voice = spanV[0];
-            msg.pitch = esMujer ? 1.5 : 0.6; // 1.5 Agudo (Mujer), 0.6 Grave (Hombre)
+        // Truco de carga asíncrona para que no falle en iOS
+        if (window.speechSynthesis.getVoices().length === 0) {{
+            window.speechSynthesis.onvoiceschanged = reproducir;
         }} else {{
-            msg.lang = 'es-MX';
-            msg.pitch = esMujer ? 1.5 : 0.6;
+            reproducir();
         }}
-
-        msg.rate = 1.0;
-        window.speechSynthesis.speak(msg);
     </script>
     """, height=0)
     st.session_state.hablar_texto = ""
