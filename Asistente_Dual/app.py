@@ -1,8 +1,10 @@
 import os
+import html
+import json
 import datetime
 import pytz
 import requests
-from urllib.parse import unquote
+from urllib.parse import unquote, quote_plus
 import yfinance as yf
 import pyjokes
 import wikipediaapi
@@ -207,14 +209,14 @@ if col3.button("🌤️ Clima"):
             f"Estamos en CDMX a {num}°C y está {c.lower()}. No se me vaya a sobrecalentar el procesador, jefe 🌡️.", 
             f"Estamos en CDMX a {num}°C y está {c.lower()}, pésimo para el cabello 💅🌧️."
         )
-    except:
+    except Exception:
         set_mensaje("Fallo de red en sensores climáticos.", "No tengo el clima ahora, gordi.")
 
 if col4.button("💵 Dólar"):
     try:
         d = yf.Ticker("MXN=X").history(period="1d")['Close'].iloc[-1]
         set_mensaje(f"El dólar está a {d:.2f} pesitos. Ni hackeando el banco nos hacemos ricos hoy, jefe.", f"El dólar está en {d:.2f} pesos. ¡Carísimo!")
-    except:
+    except Exception:
         set_mensaje("Servidor bancario no responde.", "No sé en cuánto está el dólar hoy.")
 
 if col5.button("😂 Chiste"):
@@ -224,7 +226,7 @@ if col5.button("😂 Chiste"):
 if col6.button("🗑️ Borrar"):
     set_mensaje("Buffer formateado. Todo limpio, jefe.", "Todo limpio y perfecto como yo.")
 
-st.markdown(f"<div class='consola'>{st.session_state.mensaje}</div>", unsafe_allow_html=True)
+st.markdown(f"<div class='consola'>{html.escape(st.session_state.mensaje)}</div>", unsafe_allow_html=True)
 
 
 # ==========================================
@@ -250,10 +252,10 @@ with c_bt:
                         set_mensaje(f"Extracción de datos completada. Resumen: {res}...", f"O sea, encontré esto súper rápido: {res}...")
                     else:
                         set_mensaje("Sin resultados en base de datos.", "Wikipedia no sabe de eso, gordi.")
-                except: 
+                except Exception: 
                     set_mensaje("Error de conexión con la enciclopedia.", "Wiki fuera de línea.")
         else:
-            url = f"https://www.google.com/search?q={busqueda.replace(' ', '+')}" if motor == "Google" else f"https://www.youtube.com/results?search_query={busqueda.replace(' ', '+')}"
+            url = f"https://www.google.com/search?q={quote_plus(busqueda)}" if motor == "Google" else f"https://www.youtube.com/results?search_query={quote_plus(busqueda)}"
             st.link_button(f"🚀 {motor.upper()}", url, use_container_width=True)
     else:
         st.button("BUSCAR", disabled=True, use_container_width=True)
@@ -262,14 +264,14 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 # --- REPRODUCTOR DE VOZ (JS) ---
 if st.session_state.hablar_texto:
-    # Doble filtro para asegurar que NINGÚN caracter rompa el JavaScript
-    texto = st.session_state.hablar_texto.replace('"', '').replace("'", "").replace('\n', ' ').replace('\r', '')
+    # Sanitize text for safe JavaScript embedding using json.dumps
+    texto_safe = json.dumps(st.session_state.hablar_texto.replace('\n', ' ').replace('\r', ''))
     es_mujer_js = "true" if es_nexy else "false"
     components.html(f"""
     <script>
         function reproducir() {{
             window.speechSynthesis.cancel();
-            var msg = new SpeechSynthesisUtterance("{texto}");
+            var msg = new SpeechSynthesisUtterance({texto_safe});
             var voices = window.speechSynthesis.getVoices();
             var esMujer = {es_mujer_js};
             var spanV = voices.filter(v => v.lang.startsWith('es'));
@@ -296,7 +298,7 @@ st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown(f"<h3 style='text-align:center; color:{color_tema};'>📻 Reproductor Musical</h3>", unsafe_allow_html=True)
 
 if st.session_state.playlist.actual:
-    st.markdown(f"<div style='text-align:center; padding:15px; border:1px solid {color_tema}; border-radius:10px; background-color: {card_bg}; color: {text_color};'>🎵 <b>SONANDO:</b> {st.session_state.playlist.actual.cancion.nombre}</div><br>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align:center; padding:15px; border:1px solid {color_tema}; border-radius:10px; background-color: {card_bg}; color: {text_color};'>🎵 <b>SONANDO:</b> {html.escape(st.session_state.playlist.actual.cancion.nombre)}</div><br>", unsafe_allow_html=True)
 
 col_sh, col_an, col_pl, col_si, col_re = st.columns(5)
 
@@ -355,7 +357,7 @@ if st.session_state.playlist.actual:
     contenedor_audio = st.empty()
     try:
         contenedor_audio.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo, loop=st.session_state.modo_repetir)
-    except:
+    except Exception:
         contenedor_audio.audio(st.session_state.playlist.actual.cancion.ruta, autoplay=st.session_state.reproduciendo)
 
 # ==========================================

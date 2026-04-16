@@ -1,7 +1,7 @@
-streamlit
-pytz
-requests
-yfinance
-pyjokes
-wikipedia-api
-edge-tts
+streamlit>=1.56.0,<2.0.0
+pytz>=2026.1
+requests>=2.33.0,<3.0.0
+yfinance>=1.2.0,<2.0.0
+pyjokes>=0.8.0,<1.0.0
+wikipedia-api>=0.14.0,<1.0.0
+edge-tts>=7.2.0,<8.0.0
